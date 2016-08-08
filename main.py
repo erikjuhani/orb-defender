@@ -1,17 +1,13 @@
 import pygame
 import sys
+from level import *
+from cursor import *
 
 CAPTION = "The Fortress Heart"
 WIDTH = 640
 HEIGHT = 480
 SCALE = 4
 SCREEN_SIZE = (WIDTH, HEIGHT)
-
-KEY_DICT = {pygame.K_a : 'left',
-            pygame.K_d : 'right',
-            pygame.K_w : 'up',
-            pygame.K_s : 'down',
-            pygame.K_e : 'action'}
 
 class Gui:
     def __init__(self):
@@ -27,42 +23,7 @@ class Menu:
     def start(self):
         pass
 
-class Cursor:
-    def __init__(self, x, y, size):
-        self.x = x
-        self.y = y
-        self.size = size
-        self.draw_x = self.x
-        self.draw_y = self.y
-        self.speed = 1
-        self.cooldown = 0
 
-    def update(self, keys, dt):
-        self.cooldown -= 1 * dt
-        if self.cooldown < 0:
-            self.cooldown = 0
-
-        for key in KEY_DICT:
-            if keys[key] and self.cooldown == 0:
-                print(KEY_DICT[key])
-                if KEY_DICT[key] == 'left':
-                    self.x -= self.speed
-                    self.draw_x -= self.speed * self.size
-                if KEY_DICT[key] == 'right':
-                    self.x += self.speed
-                    self.draw_x += self.speed * self.size
-                if KEY_DICT[key] == 'up':
-                    self.y -= self.speed
-                    self.draw_y -= self.speed * self.size
-                if KEY_DICT[key] == 'down':
-                    self.y += self.speed
-                    self.draw_y += self.speed * self.size
-                if KEY_DICT[key] == 'action':
-                    pass
-                self.cooldown = 0.2
-
-    def draw(self, screen):
-        pygame.draw.rect(screen, (0, 0, 0), (self.draw_x, self.draw_y, self.size, self.size), 1)
 
 
 class Heart:
@@ -83,8 +44,11 @@ class Game:
         self.running = True
         self.keys = pygame.key.get_pressed()
         self.size = 8 * SCALE
-        self.cursor = Cursor(WIDTH/2, HEIGHT/2, self.size)
         self.heart = Heart(WIDTH/2, HEIGHT/2, 100, self.size)
+
+        self.level = Level(20, self.size)
+        self.level.generate_level()
+        self.cursor = Cursor(10, 10, self.size)
 
     def event_loop(self):
         for event in pygame.event.get():
@@ -94,11 +58,12 @@ class Game:
                 self.keys = pygame.key.get_pressed()
 
     def update(self, dt):
-        self.cursor.update(self.keys, dt)
+        self.level.update(dt)
+        self.cursor.update(self.keys, self.level, dt)
 
     def render(self):
         self.screen.fill((255, 255, 255))
-        self.heart.draw(self.screen)
+        self.level.draw(self.screen)
         self.cursor.draw(self.screen)
         pygame.display.update()
 
