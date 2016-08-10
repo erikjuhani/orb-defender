@@ -42,14 +42,20 @@ class Level:
             for entity in self.entities:
                 entity.update(dt)
 
-    def draw(self, screen):
+    def draw(self, screen, xoff, yoff):
         for y in range(self.map_size):
+            yp = y + int(yoff)
+            if yp < 0 or yp >= self.map_size:
+                continue
             for x in range(self.map_size):
-                self.terrain_map[x + y * self.map_size].draw(screen)
+                xp = x + int(xoff)
+                if xp < 0 or xp >= self.map_size:
+                    continue
+                self.terrain_map[x + y * self.map_size].draw(screen, xoff, yoff)
 
         if len(self.entities) > 0:
             for entity in self.entities:
-                entity.draw(screen)
+                entity.draw(screen, xoff, yoff)
 
 class Tile:
     def __init__(self, x, y, tile_name, color, size, passable=True):
@@ -60,5 +66,5 @@ class Tile:
         self.size = size
         self.passable = passable
 
-    def draw(self, screen):
-        draw.rect(screen, self.color, (self.x*self.size, self.y*self.size, self.size, self.size))
+    def draw(self, screen, xoff, yoff):
+        draw.rect(screen, self.color, ((self.x+xoff)*self.size, (self.y+yoff)*self.size, self.size, self.size))
