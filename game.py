@@ -1,8 +1,14 @@
 from pygame import *
 from level import *
 from cursor import *
+from camera import Camera
 from gui import *
-from config import *
+
+''' Game configs '''
+SCALE = 4   # Scalar, which determines how the game is scaled. Basicly it's a multiplier.
+FPS = 30    # Frames per second
+TILE_SIZE = 8 * SCALE # Changes how big are the elements in the game world.
+MAP_SIZE = 32 # Determines the size of the playable map area. min 20. Odd numbers prefered.
 
 ''' Game configs '''
 
@@ -16,12 +22,14 @@ config =/
 class Game:
     def __init__(self):
         self.screen = display.get_surface()
+        self.screen_rect = self.screen.get_rect()
         self.clock = time.Clock()
         self.keys = key.get_pressed()
-        self.level = Level(20, TILE_SIZE)
+        self.level = Level(MAP_SIZE, TILE_SIZE)
         self.level.generate_level()
         self.running = True
-        self.cursor = Cursor(10, 10, TILE_SIZE)
+        self.cursor = Cursor(MAP_SIZE/2, MAP_SIZE/2, TILE_SIZE)
+        self.camera = Camera(self.screen_rect, TILE_SIZE, self.cursor.x, self.cursor.y)
         self.gui = Game_gui(self.screen, self.level, TILE_SIZE)
 
     def event_loop(self):
@@ -36,11 +44,12 @@ class Game:
         if not self.gui.paused:
             self.level.update(dt)
             self.cursor.update(self.keys, self.level, self.gui, dt)
+            self.camera.update(self.cursor.x, self.cursor.y, self.level)
 
     def render(self):
         self.screen.fill((255, 255, 255))
-        self.level.draw(self.screen)
-        self.cursor.draw(self.screen)
+        self.level.draw(self.screen, self.camera.x, self.camera.y)
+        self.cursor.draw(self.screen, self.camera.x, self.camera.y)
         self.gui.draw(self.screen)
         display.update()
 
