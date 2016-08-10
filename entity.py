@@ -24,7 +24,31 @@ class Monster(Entity):
         super(self.__class__, self).__init__(x, y, hp, size, color)
         self.speed = speed
         self.attack = attack
+        self.cooldown = 0
         self.brain = Brain()
+
+    def update(self, dt):
+        pass
+
+    def simple_move(self, targetx, targety, dt):
+        self.cooldown -= 1 * (self.speed/10) * dt
+
+        if self.cooldown < 0:
+            self.cooldown = 0
+
+        if self.cooldown == 0:
+            if targetx > self.x:
+                self.x += 1
+                self.cooldown = 1
+            elif targetx < self.x:
+                self.x -= 1
+                self.cooldown = 1
+            if targety > self.y:
+                self.y += 1
+                self.cooldown = 1
+            elif targety < self.y:
+                self.y -= 1
+                self.cooldown = 1
 
 class Brain:
     def __init__(self):
