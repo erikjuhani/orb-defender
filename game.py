@@ -4,6 +4,15 @@ from cursor import *
 from gui import *
 from config import *
 
+''' Game configs '''
+
+config =/
+{
+'scale' = 4   # Scalar, which determines how the game is scaled. Basicly it's a multiplier.
+'fps' = 30    # Frames per second
+'tile_size' = 8 * SCALE # Changes how big are the elements in the game world.
+}
+
 class Game:
     def __init__(self):
         self.screen = display.get_surface()
