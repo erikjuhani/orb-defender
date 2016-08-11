@@ -19,6 +19,8 @@ class Heart(Entity):
         super().__init__(x, y, hp, size, color)
         self.passable = False
 
+        
+
 class Monster(Entity):
     def __init__(self, x, y, speed, hp, size, color, attack):
         super(self.__class__, self).__init__(x, y, hp, size, color)

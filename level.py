@@ -1,7 +1,10 @@
 import random
 from pygame import draw
 from entity import *
+from tile import Tile
 from game_clock import Clock
+
+import math
 
 class Level:
     def __init__(self, map_size, tile_size):
@@ -13,25 +16,29 @@ class Level:
         self.monsters = []
         self.generate_level()
         self.spawn_entities()
-        self.game_clock = Clock(6, 0, 50, 6)
+        self.game_clock = Clock(6, 0, 90, 6)
         self.brightness_layer = 1.0
         self.game_start = True
+        self.tiles = {
+            'sand' : Tile((0,0), "Sand", (244, 219, 168), self.tile_size),
+            'wall' : Tile((0,0), "Wall", (60, 50, 33), self.tile_size, False, True)
+            }
 
     def create_tile(self, x, y, tile_name):
 
         tile = None
 
         if tile_name == "Wall":
-            tile = Tile(x, y, "Wall", (60, 50, 33), self.tile_size)
+            tile = Tile((x, y), "Wall", (60, 50, 33), self.tile_size, False, True)
         else:
-            tile = Tile(x, y, "Sand", (244, 219, 168), self.tile_size)
+            tile = Tile((x, y), "Sand", (244, 219, 168), self.tile_size)
 
         pos = (int(x + y * self.map_size))
         self.terrain_map[pos] = tile
 
     def break_tile(self, x, y):
         pos = (int(x + y * self.map_size))
-        self.terrain_map[pos] = Tile(x, y, "Rubble", (146, 133, 108), self.tile_size)
+        self.terrain_map[pos] = Tile((x, y), "Rubble", (146, 133, 108), self.tile_size)
 
     def spawn_entities(self):
         self.entities.append(Heart(self.map_size/2, self.map_size/2, 10, self.tile_size, (255, 0, 0)))
@@ -39,7 +46,6 @@ class Level:
 
     def spawn_monster(self):
         # Spawn area
-        # x = - 1 - map_size + 1
         spawn_area = [-1, self.map_size + 1]
 
         for i in range(10):
@@ -57,7 +63,7 @@ class Level:
     def generate_level(self):
         for y in range(self.map_size):
             for x in range(self.map_size):
-                self.terrain_map[x + y * self.map_size] = Tile(x, y, "Sand", (244, 219, 168), self.tile_size)
+                self.terrain_map[x + y * self.map_size] = Tile((x,y), "Sand", (244, 219, 168), self.tile_size)
 
     def update(self, dt):
 
@@ -92,79 +98,29 @@ class Level:
     def draw(self, screen, xoff, yoff):
         for y in range(self.map_size):
             yp = y + int(yoff)
-            if yp < 0 or yp >= self.map_size:
-                continue
             for x in range(self.map_size):
                 xp = x + int(xoff)
-                if xp < 0 or xp >= self.map_size:
-                    continue
                 tile = self.terrain_map[x + y * self.map_size]
                 tile.change_brightness(self.brightness_layer)
+                if tile.light_source:
+                    for yp in range(y-3, y+4):
+                        for xp in range(x-3, x+4):
+                            tile_l = self.terrain_map[xp + yp * self.map_size]
+                            vx = tile.x - tile_l.x
+                            vy = tile.y - tile_l.y
+                            distance = math.sqrt(vx*vx + vy*vy)
+                            light_amount = 1 - distance/4
+                            if light_amount < 0:
+                                light_amount = 0
+                            tile_l.add_light(light_amount)
+                else:
+                    tile.emit_light = 0
                 tile.draw(screen, xoff, yoff)
+                if yp < 0 or yp >= self.map_size or xp < 0 or xp >= self.map_size:
+                    continue
 
         if len(self.entities) > 0:
             for entity in self.entities:
                 entity.draw(screen, xoff, yoff)
         for monster in self.monsters:
             monster.draw(screen, xoff, yoff)
-
-class Tile:
-    def __init__(self, x, y, tile_name, color, size, passable=True, light_source=False):
-        self.x = x
-        self.y = y
-        self.tile_name = tile_name
-        self.color = color
-        self.origc = color
-        self.brightness_layer = 1.0
-        self.size = size
-        self.passable = passable
-        self.light_source = light_source
-
-    def change_brightness(self, amount, tint=None):
-        r = self.origc[0]
-        g = self.origc[1]
-        b = self.origc[2]
-
-        max_r = r
-        max_g = g
-        max_b = b
-
-        min_r = r * 0.01
-        min_g = g * 0.01
-        min_b = b * 0.01
-
-        r *= amount
-        g *= amount
-        b *= amount
-
-        if not tint == None:
-            if 'r' in tint:
-                r += r * amount
-            if 'g' in tint:
-                g += g * amount
-            if 'b' in tint:
-                b += b * amount
-
-        if r < min_r:
-            r = min_r
-        if g < min_g:
-            g = min_g
-        if b < min_b:
-            b = min_b
-
-        if r > max_r:
-            r = max_r
-        if g > max_g:
-            g = max_g
-        if b > max_b:
-            b = max_b
-
-        if not self.light_source:
-            self.color = (r, g, b)
-
-    def update(self, dt):
-        pass
-
-
-    def draw(self, screen, xoff, yoff):
-        draw.rect(screen, self.color, ((self.x+xoff)*self.size, (self.y+yoff)*self.size, self.size, self.size))
