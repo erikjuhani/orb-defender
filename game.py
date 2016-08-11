@@ -10,15 +10,6 @@ FPS = 30    # Frames per second
 TILE_SIZE = 8 * SCALE # Changes how big are the elements in the game world.
 MAP_SIZE = 32 # Determines the size of the playable map area. min 20. Odd numbers prefered.
 
-''' Game configs '''
-
-config =/
-{
-'scale' = 4   # Scalar, which determines how the game is scaled. Basicly it's a multiplier.
-'fps' = 30    # Frames per second
-'tile_size' = 8 * SCALE # Changes how big are the elements in the game world.
-}
-
 class Game:
     def __init__(self):
         self.screen = display.get_surface()
