@@ -3,7 +3,7 @@ import sys
 from game import Game
 
 ''' Window constants '''
-CAPTION = "The Fortress Heart"
+CAPTION = 'Kingdom Heart'
 WIDTH = 640
 HEIGHT = 480
 SCREEN_SIZE = (WIDTH, HEIGHT)

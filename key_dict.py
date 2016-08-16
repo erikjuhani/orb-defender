@@ -11,6 +11,7 @@ KEY_DICT = {
             K_DOWN  : 'down',
             K_e     : 'action',
             K_r     : 'switch',
+            K_f     : 'block',
             K_p     : 'pause',
             K_ESCAPE: 'escape'
             }

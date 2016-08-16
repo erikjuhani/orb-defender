@@ -9,6 +9,8 @@ SCALE = 4   # Scalar, which determines how the game is scaled. Basicly it's a mu
 FPS = 30    # Frames per second
 TILE_SIZE = 8 * SCALE # Changes how big are the elements in the game world.
 MAP_SIZE = 32 # Determines the size of the playable map area. min 20. Odd numbers prefered.
+TILES = {'sand' : Tile('Sand', (244, 219, 168), TILE_SIZE),
+         'wall' : ("Wall", (60, 50, 33), TILE_SIZE, False, True)}
 
 class Game:
     def __init__(self):
@@ -16,7 +18,7 @@ class Game:
         self.screen_rect = self.screen.get_rect()
         self.clock = time.Clock()
         self.keys = key.get_pressed()
-        self.level = Level(MAP_SIZE, TILE_SIZE)
+        self.level = Level(MAP_SIZE, TILE_SIZE, TILES)
         self.level.generate_level()
         self.running = True
         self.cursor = Cursor(MAP_SIZE/2, MAP_SIZE/2, TILE_SIZE)
@@ -31,10 +33,10 @@ class Game:
                 self.keys = key.get_pressed()
 
     def update(self, dt):
-        self.gui.update(self.keys, dt)
-        if not self.gui.paused:
+        self.gui.update(self.cursor, self.keys, self.level, dt)
+        if not self.gui.paused and self.level.heart_hp > 0:
             self.level.update(dt)
-            self.cursor.update(self.keys, self.level, self.gui, dt)
+            self.cursor.update(self.keys, self.level, dt)
             self.camera.update(self.cursor.x, self.cursor.y, self.level)
 
     def render(self):
