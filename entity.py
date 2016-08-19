@@ -92,7 +92,7 @@ class Monster(Entity):
         dmg = 0
 
         for bullet in bullets:
-            if int(bullet.x) >= int(self.x - 0.5) and int(bullet.x) <= int(self.x + 0.5) and int(bullet.y) >= int(self.y - 0.5) and int(bullet.y) <= int(self.y - 0.5):
+            if int(bullet.x) >= int(self.x - 1) and int(bullet.x) <= int(self.x + 1) and int(bullet.y) >= int(self.y - 1) and int(bullet.y) <= int(self.y - 1):
                 dmg = bullet.dmg
                 bullets.remove(bullet)
                 continue

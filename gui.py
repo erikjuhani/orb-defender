@@ -25,6 +25,7 @@ class Game_gui:
         self.block = 0
         self.gold = level.gold
         self.paused = False
+        self.current_block = (0, 0, 0)
 
     def change_block(self):
         pass
@@ -51,9 +52,17 @@ class Game_gui:
         self.identifier(cursor.x, cursor.y, level.monsters)
         if level.gold < self.gold or level.gold > self.gold:
             self.gold = level.gold
+        if cursor.menu_block[cursor.block] == 'Wall':
+            self.current_block = (60, 50, 33)
+        elif cursor.menu_block[cursor.block] == 'Tower':
+            self.current_block = (60, 100, 33)
+        elif cursor.menu_block[cursor.block] == 'Torch':
+            self.current_block = (255, 255, 255)
+
 
     def draw(self, screen):
         draw.rect(screen, (0, 0, 0), (self.x, self.y, self.width, self.size))
+        draw.rect(screen, self.current_block, (self.width-self.size*2, self.y, self.size, self.size))
         draw.ellipse(screen, (255, 255, 0), (self.x + self.size/3, self.y+self.size/3-1, self.size/2-1, self.size/2-1))
         screen.blit(self.draw_msg(self.gold), (self.x + self.size, self.y + self.size/5))
         screen.blit(self.draw_msg(self.current_i), (self.x + self.size*4, self.y + self.size/5))

@@ -1,11 +1,6 @@
 from pygame import *
 from key_dict import *
 
-menu_switch = {'Build' : True}
-menu_block = {0 : 'Wall',
-         1 : 'Tower',
-         2 : 'Torch'}
-
 class Cursor:
     def __init__(self, x, y, size):
         self.x = int(x)
@@ -14,6 +9,10 @@ class Cursor:
         self.speed = 1
         self.cooldown = 0
         self.block = 0
+        self.menu_switch = {'Build' : True}
+        self.menu_block = {0 : 'Wall',
+                 1 : 'Tower',
+                 2 : 'Torch'}
 
     def check_border(self, level, location):
         if location < 0 or location >= level.map_size:
@@ -24,6 +23,8 @@ class Cursor:
         self.cooldown -= 1 * dt
         if self.cooldown < 0:
             self.cooldown = 0
+
+        tile = level.terrain_map[self.x + self.y * level.map_size]
 
         for key in KEY_DICT:
             if keys[key] and self.cooldown == 0:
@@ -40,7 +41,7 @@ class Cursor:
                     if self.check_border(level, self.y + self.speed):
                         self.y += self.speed
                 if KEY_DICT[key] == 'switch':
-                    menu_switch['Build'] = not menu_switch['Build']
+                    self.menu_switch['Build'] = not self.menu_switch['Build']
 
                 if KEY_DICT[key] == 'block':
                     self.block += 1
@@ -48,13 +49,13 @@ class Cursor:
                         self.block = 0
 
                 if KEY_DICT[key] == 'action':
-                    if menu_switch['Build'] and level.gold > 0:
-                        if level.terrain_map[int(self.x) + int(self.y) * level.map_size].passable:
-                            level.create_tile(self.x, self.y, menu_block[self.block])
-                    elif not menu_switch['Build']:
-                        if not level.terrain_map[self.x + self.y * level.map_size].passable:
+                    if self.menu_switch['Build'] and level.gold > 0:
+                        if tile.passable:
+                            level.create_tile(self.x, self.y, self.menu_block[self.block])
+                    elif not self.menu_switch['Build']:
+                        if not tile.passable:
                             level.break_tile(self.x, self.y)
-                            level.gold += 1
+                            level.gold += tile.tile_price
                 self.cooldown = 0.2
 
     def draw(self, screen, xoff, yoff):

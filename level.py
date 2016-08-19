@@ -12,31 +12,30 @@ class Level:
         self.tile_size = tile_size
         self.tiles = tiles
         self.terrain_map = [0] * (self.map_size * self.map_size) # init empty map
-        self.entity_map  = [0] * (self.map_size * self.map_size)
-        self.entities = []
         self.heart_pos = 0
         self.heart_hp = 20
+        self.entities = []
         self.monsters = []
         self.bullets = []
         self.generate_level()
-        self.game_clock = Clock(6, 0, 10, 6)
+        self.game_clock = Clock(6, 0, 40, 6)
         self.brightness_layer = 1.0
         self.game_start = True
-        self.gold = 100
+        self.gold = 50
 
     def create_tile(self, x, y, tile_name):
 
         tile = None
 
         if tile_name == 'Tower':
-            tile = Tile('Tower', (60, 100, 33), self.tile_size, 4, False)
-            self.gold -= 10
+            tile = Tile('Tower', (60, 100, 33), self.tile_size, 4, False, False, 4)
+            self.gold -= 4
         elif tile_name == 'Wall':
-            tile = Tile('Wall', (60, 50, 33), self.tile_size, 20, False)
-            self.gold -= 5
-        elif tile_name == 'Torch':
-            tile = Tile('Torch', (255, 255, 255), self.tile_size, 1, False, True)
+            tile = Tile('Wall', (60, 50, 33), self.tile_size, 20, False, False, 2)
             self.gold -= 2
+        elif tile_name == 'Torch':
+            tile = Tile('Torch', (255, 255, 255), self.tile_size, 2, False, True, 1)
+            self.gold -= 1
         else:
             tile = Tile('Sand', (244, 219, 168), self.tile_size)
 
@@ -81,15 +80,15 @@ class Level:
         self.spawn_entities()
 
     def light_tile(self, ox, oy):
-        for y in range(oy-4, oy+5):
-            for x in range(ox-4, ox+5):
+        for y in range(oy-6, oy+7):
+            for x in range(ox-6, ox+7):
                 if x >= 0 and x < self.map_size and y >= 0 and y < self.map_size:
                     map_pos = x + y * self.map_size
                     tile_l = self.terrain_map[map_pos]
                     vx = ox - x
                     vy = oy - y
                     distance = math.sqrt(vx*vx + vy*vy)
-                    light_amount = 1 - distance/5
+                    light_amount = 1 - distance/7
                     if distance <= 1:
                         light_amount += 0.3
                     elif distance <= 2 and distance > 1:
@@ -108,6 +107,7 @@ class Level:
             for x in range(self.map_size):
                 map_pos = x + y * self.map_size
                 tile = self.terrain_map[map_pos]
+
                 if not tile.passable:
                     tile.attack(x, y, self, self.monsters, dt)
                     if tile.hp <= 0:
@@ -115,6 +115,13 @@ class Level:
 
                 if tile.tile_name == 'Heart' and self.heart_hp > tile.hp:
                     self.heart_hp = tile.hp
+
+                tile.change_brightness(self.brightness_layer)
+
+                if tile.light_source:
+                    self.light_tile(x, y)
+                else:
+                    tile.emit_light = 0
                 tile.update(dt)
         self.game_clock.tick(dt)
 
@@ -143,7 +150,7 @@ class Level:
             for monster in self.monsters:
                 if monster.hp == 0:
                     self.monsters.remove(monster)
-                    self.gold += 1
+                    self.gold += monster.full_hp/2
                     continue
                 monster.take_dmg(self.bullets)
                 monster.simple_move(self, self.heart_pos[0], self.heart_pos[1], dt)
@@ -151,6 +158,11 @@ class Level:
         if len(self.bullets) > 0:
             for bullet in self.bullets:
                 bullet.update(dt)
+                x = bullet.x
+                y = bullet.y
+                if x < 0 or x >= self.map_size or y < 0 or y >= self.map_size:
+                    self.bullets.remove(bullet)
+                    continue
 
     def draw(self, screen, xoff, yoff):
         for y in range(self.map_size):
@@ -159,13 +171,6 @@ class Level:
                 xp = x + int(xoff)
                 map_pos = x + y * self.map_size
                 tile = self.terrain_map[map_pos]
-                tile.change_brightness(self.brightness_layer)
-                if tile.light_source:
-                    #if x in range(x-4, x+5) and y in range(y-4, y+5):
-                    #    if self.terrain_map[x + y * self.map_size].emit_light == 0:
-                    self.light_tile(x, y)
-                else:
-                    tile.emit_light = 0
                 tile.draw(screen, x, y, xoff, yoff)
                 if yp < 0 or yp >= self.map_size or xp < 0 or xp >= self.map_size:
                     continue
@@ -173,6 +178,10 @@ class Level:
         if len(self.bullets) > 0:
             for bullet in self.bullets:
                 bullet.draw(screen, xoff, yoff)
+                x = bullet.x + xoff
+                y = bullet.y + yoff
+                if x < 0 or x >= self.map_size or y < 0 or y >= self.map_size:
+                    continue
 
         if len(self.entities) > 0:
             for entity in self.entities:

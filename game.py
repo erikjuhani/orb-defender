@@ -40,7 +40,6 @@ class Game:
             self.camera.update(self.cursor.x, self.cursor.y, self.level)
 
     def render(self):
-        self.screen.fill((255, 255, 255))
         self.level.draw(self.screen, self.camera.x, self.camera.y)
         self.cursor.draw(self.screen, self.camera.x, self.camera.y)
         self.gui.draw(self.screen)

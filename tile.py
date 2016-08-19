@@ -12,7 +12,6 @@ class Tile:
         self.passable = passable
         self.light_source = light_source
         self.emit_light = 0
-        self.taking_dmg = False
         self.cooldown = 0
         self.tile_price = tile_price
 
