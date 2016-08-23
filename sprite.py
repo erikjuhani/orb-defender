@@ -1,8 +1,17 @@
 from pygame import *
 
+class Sprite:
+    def __init__(self, img):
+        self.img = image.load(img)
+        self.static_array = PixelArray(image.load(img))
+
+''' Static sprites '''
+
+orb = Sprite('img/orb.png')
+
 ''' pygame.surfarray.pixels2d(), manipulates the pixels, for rgb changes, no copying, faster '''
 
-wall_sprite = image.load('wall.png')
+"""
 pixel_array = PixelArray(wall_sprite)
 
 size = len(pixel_array)
@@ -70,9 +79,10 @@ screen = display.set_mode(screen_size)
 while True:
     for e in event.get():
         if e.type == QUIT:
-            pygame.quit()
+            quit()
     screen.blit(wall_sprite, (200-wall_sprite.get_width()/2, 200-wall_sprite.get_height()/2))
     display.update()
 
 
 quit()
+"""
