@@ -49,6 +49,11 @@ class Game_gui:
                         self.block = 0
                 if KEY_DICT[key] == 'pause':
                     self.paused = not self.paused
+                if KEY_DICT[key] == 'switch' and level.heart_hp <= 0:
+                    level.restart_level()
+                    cursor.x = int(level.map_size/2)
+                    cursor.y = int(level.map_size/2)
+
         self.identifier(cursor.x, cursor.y, level.monsters)
         if level.gold < self.gold or level.gold > self.gold:
             self.gold = level.gold

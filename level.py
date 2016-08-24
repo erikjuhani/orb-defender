@@ -8,11 +8,22 @@ from sprite import *
 import math
 
 class Level:
-    def __init__(self, map_size, tile_size, tiles):
+    def __init__(self, map_size, tile_size):
         self.map_size = map_size
         self.tile_size = tile_size
-        self.tiles = tiles
         self.terrain_map = [0] * (self.map_size * self.map_size) # init empty map
+        self.heart_pos = 0
+        self.heart_hp = 20
+        self.entities = []
+        self.monsters = []
+        self.bullets = []
+        self.generate_level()
+        self.game_clock = Clock(18, 0, 40, 6)
+        self.brightness_layer = 1.0
+        self.game_start = True
+        self.gold = 20
+
+    def restart_level(self):
         self.heart_pos = 0
         self.heart_hp = 20
         self.entities = []
