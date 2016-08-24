@@ -13,5 +13,6 @@ KEY_DICT = {
             K_r     : 'switch',
             K_f     : 'block',
             K_p     : 'pause',
-            K_ESCAPE: 'escape'
+            K_ESCAPE: 'escape',
+            K_q     : 'escape'
             }

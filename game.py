@@ -23,6 +23,7 @@ class Game:
         self.cursor = Cursor(MAP_SIZE/2, MAP_SIZE/2, TILE_SIZE)
         self.camera = Camera(self.screen_rect, TILE_SIZE, self.cursor.x, self.cursor.y)
         self.gui = Game_gui(self.screen, self.level, TILE_SIZE)
+        self.menu = Main_menu(TILE_SIZE)
 
     def event_loop(self):
         for e in event.get():
@@ -32,17 +33,23 @@ class Game:
                 self.keys = key.get_pressed()
 
     def update(self, dt):
-        self.gui.update(self.cursor, self.keys, self.level, dt)
-        if not self.gui.paused and self.level.heart_hp > 0:
-            self.level.update(dt)
-            self.cursor.update(self.keys, self.level, dt)
-            self.camera.update(self.cursor.x, self.cursor.y, self.level)
+        if self.menu.game_state:
+            self.gui.update(self.menu, self.cursor, self.keys, self.level, dt)
+            if not self.gui.paused and self.level.heart_hp > 0:
+                self.level.update(dt)
+                self.cursor.update(self.keys, self.level, dt)
+                self.camera.update(self.cursor.x, self.cursor.y, self.level)
+        else:
+            self.menu.update(self, self.keys, dt)
 
     def render(self):
         self.screen.blit(self.background, (0,0))
-        self.level.draw(self.screen, self.camera.x, self.camera.y)
-        self.cursor.draw(self.screen, self.camera.x, self.camera.y)
-        self.gui.draw(self.screen)
+        if self.menu.game_state:
+            self.level.draw(self.screen, self.camera.x, self.camera.y)
+            self.cursor.draw(self.screen, self.camera.x, self.camera.y)
+            self.gui.draw(self.screen)
+        else:
+            self.menu.draw(self.screen)
         display.update()
 
     def game_loop(self):
