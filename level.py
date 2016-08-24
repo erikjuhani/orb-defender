@@ -171,17 +171,18 @@ class Level:
                 xp = x + int(xoff)
                 map_pos = x + y * self.map_size
                 tile = self.terrain_map[map_pos]
-                tile.draw(screen, x, y, xoff, yoff)
                 if yp < 0 or yp >= self.map_size or xp < 0 or xp >= self.map_size:
                     continue
+                tile.draw(screen, x, y, xoff, yoff)
 
         if len(self.bullets) > 0:
             for bullet in self.bullets:
-                bullet.draw(screen, xoff, yoff)
                 x = bullet.x + xoff
                 y = bullet.y + yoff
                 if x < 0 or x >= self.map_size or y < 0 or y >= self.map_size:
                     continue
+                bullet.draw(screen, xoff, yoff)
+
 
         if len(self.entities) > 0:
             for entity in self.entities:
