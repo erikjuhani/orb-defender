@@ -82,7 +82,7 @@ class Tile:
 
         for y in range(size):
             for x in range(size):
-                pixel_array[x, y] = self.change_brightness(amount, self.sprite.img.unmap_rgb(self.sprite.static_array[x, y]))
+                pixel_array[x, y] = self.change_brightness(amount, self.sprite.img.unmap_rgb(self.sprite.static_array[x, y]), tint)
 
         del pixel_array
 

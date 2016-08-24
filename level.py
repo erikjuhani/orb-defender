@@ -27,16 +27,15 @@ class Level:
     def create_tile(self, x, y, tile_name):
 
         tile = None
-        blocking = False
 
         if tile_name == 'Tower':
-            tile = Tile('Tower', (60, 100, 33), self.tile_size, 4, blocking, Sprite('img/tower.png'), False, 4)
+            tile = Tile('Tower', (60, 100, 33), self.tile_size, 4, False, Sprite('img/tower.png'), False, 4)
             self.gold -= 4
         elif tile_name == 'Wall':
-            tile = Tile('Wall', (60, 50, 33), self.tile_size, 20, blocking, Sprite('img/wall.png'), False, 2)
+            tile = Tile('Wall', (60, 50, 33), self.tile_size, 20, False, Sprite('img/wall.png'), False, 2)
             self.gold -= 2
         elif tile_name == 'Torch':
-            tile = Tile('Torch', (255, 255, 255), self.tile_size, 2, blocking, Sprite('img/torch.png'), True, 1)
+            tile = Tile('Torch', (255, 255, 255), self.tile_size, 2, False, Sprite('img/torch.png'), True, 1)
             self.gold -= 1
         else:
             tile = Tile('Sand', (244, 219, 168), self.tile_size)
@@ -49,8 +48,6 @@ class Level:
         self.terrain_map[pos] = Tile("Rubble", (146, 133, 108), self.tile_size)
 
     def spawn_entities(self):
-        #self.entities.append(Heart(self.map_size/2, self.map_size/2, 10, self.tile_size, (255, 0, 0)))
-        #self.entity_map[int((self.map_size * self.map_size)/2)] = self.entities[0]
         x = int(self.map_size/2)
         y = int(self.map_size/2)
         self.heart_pos = (x, y)
@@ -64,7 +61,7 @@ class Level:
         amount = (self.game_clock.days + 1)
 
         if self.game_clock.days % 5 == 0:
-            amount += self.game_clock.days * 5
+            amount += self.game_clock.days * 2
 
         for i in range(amount):
 
@@ -133,6 +130,7 @@ class Level:
                 else:
                     tile.emit_light = 0
                 tile.update(dt)
+
         self.game_clock.tick(dt)
 
         if self.game_clock.hours >= 18 or self.game_clock.hours < 6:
