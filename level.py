@@ -1,8 +1,9 @@
 import random
-from pygame import draw
+from pygame import *
 from entity import *
 from tile import Tile
 from game_clock import Clock
+from sprite import *
 
 import math
 
@@ -21,20 +22,20 @@ class Level:
         self.game_clock = Clock(6, 0, 40, 6)
         self.brightness_layer = 1.0
         self.game_start = True
-        self.gold = 50
+        self.gold = 20
 
     def create_tile(self, x, y, tile_name):
 
         tile = None
 
         if tile_name == 'Tower':
-            tile = Tile('Tower', (60, 100, 33), self.tile_size, 4, False, False, 4)
+            tile = Tile('Tower', (60, 100, 33), self.tile_size, 4, False, Sprite('img/tower.png'), False, 4)
             self.gold -= 4
         elif tile_name == 'Wall':
-            tile = Tile('Wall', (60, 50, 33), self.tile_size, 20, False, False, 2)
+            tile = Tile('Wall', (60, 50, 33), self.tile_size, 20, False, Sprite('img/wall.png'), False, 2)
             self.gold -= 2
         elif tile_name == 'Torch':
-            tile = Tile('Torch', (255, 255, 255), self.tile_size, 2, False, True, 1)
+            tile = Tile('Torch', (255, 255, 255), self.tile_size, 2, False, Sprite('img/torch.png'), True, 1)
             self.gold -= 1
         else:
             tile = Tile('Sand', (244, 219, 168), self.tile_size)
@@ -47,19 +48,22 @@ class Level:
         self.terrain_map[pos] = Tile("Rubble", (146, 133, 108), self.tile_size)
 
     def spawn_entities(self):
-        #self.entities.append(Heart(self.map_size/2, self.map_size/2, 10, self.tile_size, (255, 0, 0)))
-        #self.entity_map[int((self.map_size * self.map_size)/2)] = self.entities[0]
         x = int(self.map_size/2)
         y = int(self.map_size/2)
         self.heart_pos = (x, y)
         map_pos = x + y * self.map_size
-        self.terrain_map[map_pos] = Tile('Heart', (255, 0, 0), self.tile_size, self.heart_hp, False, True)
+        self.terrain_map[map_pos] = Tile('Heart', (255, 0, 0), self.tile_size, self.heart_hp, False, orb, True)
 
     def spawn_monster(self):
         # Spawn area
         spawn_area = [-1, self.map_size + 1]
 
-        for i in range(1 * self.game_clock.days):
+        amount = (self.game_clock.days + 1)
+
+        if self.game_clock.days % 5 == 0:
+            amount += self.game_clock.days * 2
+
+        for i in range(amount):
 
             randx = random.randint(-1, self.map_size + 1)
             randy = 0
@@ -116,13 +120,17 @@ class Level:
                 if tile.tile_name == 'Heart' and self.heart_hp > tile.hp:
                     self.heart_hp = tile.hp
 
-                tile.change_brightness(self.brightness_layer)
+                if not tile.sprite == None:
+                    tile.change_img_brightness(self.brightness_layer)
+                else:
+                    tile.change_brightness(self.brightness_layer)
 
                 if tile.light_source:
                     self.light_tile(x, y)
                 else:
                     tile.emit_light = 0
                 tile.update(dt)
+
         self.game_clock.tick(dt)
 
         if self.game_clock.hours >= 18 or self.game_clock.hours < 6:
@@ -150,7 +158,7 @@ class Level:
             for monster in self.monsters:
                 if monster.hp == 0:
                     self.monsters.remove(monster)
-                    self.gold += monster.full_hp/2
+                    self.gold += 2
                     continue
                 monster.take_dmg(self.bullets)
                 monster.simple_move(self, self.heart_pos[0], self.heart_pos[1], dt)

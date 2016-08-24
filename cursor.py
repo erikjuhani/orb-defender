@@ -28,17 +28,13 @@ class Cursor:
 
         for key in KEY_DICT:
             if keys[key] and self.cooldown == 0:
-                if KEY_DICT[key] == 'left':
-                    if self.check_border(level, self.x - self.speed):
+                if KEY_DICT[key] == 'left' and self.check_border(level, self.x - self.speed):
                         self.x -= self.speed
-                if KEY_DICT[key] == 'right':
-                    if self.check_border(level, self.x + self.speed):
+                if KEY_DICT[key] == 'right' and self.check_border(level, self.x + self.speed):
                         self.x += self.speed
-                if KEY_DICT[key] == 'up':
-                    if self.check_border(level, self.y - self.speed):
+                if KEY_DICT[key] == 'up' and self.check_border(level, self.y - self.speed):
                         self.y -= self.speed
-                if KEY_DICT[key] == 'down':
-                    if self.check_border(level, self.y + self.speed):
+                if KEY_DICT[key] == 'down' and self.check_border(level, self.y + self.speed):
                         self.y += self.speed
                 if KEY_DICT[key] == 'switch':
                     self.menu_switch['Build'] = not self.menu_switch['Build']
