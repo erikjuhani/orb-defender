@@ -63,7 +63,7 @@ class Level:
         if self.game_clock.days % 5 == 0:
             amount += self.game_clock.days * 2
 
-        for i in range(amount):
+        for i in range(amount + 100):
 
             randx = random.randint(-1, self.map_size + 1)
             randy = 0
@@ -195,8 +195,13 @@ class Level:
         if len(self.entities) > 0:
             for entity in self.entities:
                 entity.draw(screen, xoff, yoff)
+
         for monster in self.monsters:
             monster_pos = monster.x + monster.y * self.map_size
+            x = monster.x + xoff
+            y = monster.y + yoff
+            if x < 0 or x >= self.map_size or y < 0 or y >= self.map_size:
+                continue
             if monster_pos > 0 and monster_pos < (self.map_size * self.map_size):
                 monster.change_brightness(self.brightness_layer)
                 if self.terrain_map[monster_pos].emit_light == 0:
