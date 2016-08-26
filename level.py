@@ -18,7 +18,7 @@ class Level:
         self.monsters = []
         self.bullets = []
         self.generate_level()
-        self.game_clock = Clock(18, 0, 40, 6)
+        self.game_clock = Clock(18, 0, 20, 6)
         self.brightness_layer = 1.0
         self.game_start = True
         self.gold = 20
@@ -30,7 +30,7 @@ class Level:
         self.monsters = []
         self.bullets = []
         self.generate_level()
-        self.game_clock = Clock(6, 0, 40, 6)
+        self.game_clock = Clock(6, 0, 20, 6)
         self.brightness_layer = 1.0
         self.game_start = True
         self.gold = 20
@@ -40,13 +40,13 @@ class Level:
         tile = None
 
         if tile_name == 'Tower':
-            tile = Tile('Tower', (60, 100, 33), self.tile_size, 4, False, Sprite('img/tower.png'), False, 4)
+            tile = Tile('Tower', (244, 219, 168), self.tile_size, Sprite('img/tower.png'), 4, False, False, 4)
             self.gold -= 4
         elif tile_name == 'Wall':
-            tile = Tile('Wall', (60, 50, 33), self.tile_size, 20, False, Sprite('img/wall.png'), False, 2)
+            tile = Tile('Wall', (244, 219, 168), self.tile_size, Sprite('img/wall.png'), 20, False, False, 2)
             self.gold -= 2
         elif tile_name == 'Torch':
-            tile = Tile('Torch', (255, 255, 255), self.tile_size, 2, False, Sprite('img/torch.png'), True, 1)
+            tile = Tile('Torch', (244, 219, 168), self.tile_size, Sprite('img/torch.png'), 2, False, True, 1)
             self.gold -= 1
         else:
             tile = Tile('Sand', (244, 219, 168), self.tile_size)
@@ -56,14 +56,14 @@ class Level:
 
     def break_tile(self, x, y):
         pos = (int(x + y * self.map_size))
-        self.terrain_map[pos] = Tile("Rubble", (146, 133, 108), self.tile_size)
+        self.terrain_map[pos] = Tile('Rubble', (146, 133, 108), self.tile_size)
 
     def spawn_entities(self):
         x = int(self.map_size/2)
         y = int(self.map_size/2)
         self.heart_pos = (x, y)
         map_pos = x + y * self.map_size
-        self.terrain_map[map_pos] = Tile('Heart', (255, 0, 0), self.tile_size, self.heart_hp, False, orb, True)
+        self.terrain_map[map_pos] = Tile('Heart', (244, 219, 168), self.tile_size, orb, self.heart_hp, False, True)
 
     def spawn_monster(self):
         # Spawn area
@@ -74,7 +74,7 @@ class Level:
         if self.game_clock.days % 5 == 0:
             amount += self.game_clock.days * 2
 
-        for i in range(amount + 100):
+        for i in range(amount):
 
             randx = random.randint(-1, self.map_size + 1)
             randy = 0
@@ -84,8 +84,9 @@ class Level:
             else:
                 randy = random.randint(-1, self.map_size + 1)
 
-            monster = Monster(randx, randy, random.randint(3, 10), 10, self.tile_size, (114, 127, 79), 1)
-            self.monsters.append(monster)
+            basic_monster = Monster(randx, randy, random.randint(5, 7), 10, self.tile_size, (114, 127, 79), 2, False, Sprite('img/monster1.png'))
+            flying_monster = Monster(randx, randy, random.randint(8, 10), 10, self.tile_size, (114, 127, 79), 0.5, True, Sprite('img/monster3.png'))
+            self.monsters.append(basic_monster)
 
     def generate_level(self):
         for y in range(self.map_size):
@@ -133,8 +134,8 @@ class Level:
 
                 if not tile.sprite == None:
                     tile.change_img_brightness(self.brightness_layer)
-                else:
-                    tile.change_brightness(self.brightness_layer)
+
+                tile.change_brightness(self.brightness_layer)
 
                 if tile.light_source:
                     self.light_tile(x, y)
@@ -168,6 +169,8 @@ class Level:
         if len(self.monsters) > 0:
             for monster in self.monsters:
                 if monster.hp == 0:
+                    pos = (int(monster.x + monster.y * self.map_size))
+                    self.terrain_map[pos] = Tile('Bones', (244, 219, 168), self.tile_size, Sprite('img/bones.png'))
                     self.monsters.remove(monster)
                     self.gold += 2
                     continue
@@ -214,7 +217,7 @@ class Level:
             if x < 0 or x >= self.map_size or y < 0 or y >= self.map_size:
                 continue
             if monster_pos > 0 and monster_pos < (self.map_size * self.map_size):
-                monster.change_brightness(self.brightness_layer)
+                monster.change_img_brightness(self.brightness_layer)
                 if self.terrain_map[monster_pos].emit_light == 0:
                     monster.emit_light = 0
                 else:

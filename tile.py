@@ -2,7 +2,7 @@ from pygame import *
 from bullet import *
 
 class Tile:
-    def __init__(self, tile_name, color, size, hp=0, passable=True, sprite=None, light_source=False, tile_price=0):
+    def __init__(self, tile_name, color, size, sprite=None, hp=0, passable=True, light_source=False, tile_price=0):
         self.tile_name = tile_name
         self.hp = hp
         self.full_hp = hp
@@ -96,7 +96,7 @@ class Tile:
             for y in range(oy-4, oy+5):
                 for x in range(ox-4, ox+5):
                     for m in monsters:
-                        if m.x == x and m.y == y:
+                        if m.x == x and m.y == y and not m.flyer:
                             level.bullets.append(Bullet(m.x, m.y, ox, oy, 3, self.size))
                             self.cooldown = 4
 
@@ -115,9 +115,8 @@ class Tile:
 
     def draw(self, screen, x, y, xoff, yoff):
 
-        if self.sprite == None:
-            #draw.rect(screen, self.color, ((x+xoff)*self.size, (y+yoff)*self.size, self.size, self.size))
-            screen.blit(self.surface, ((x+xoff)*self.size, (y+yoff)*self.size))
-        else:
+        #draw.rect(screen, self.color, ((x+xoff)*self.size, (y+yoff)*self.size, self.size, self.size))
+        screen.blit(self.surface, ((x+xoff)*self.size, (y+yoff)*self.size))
+        if not self.sprite == None:
             sprite = transform.scale(self.sprite.img, (self.size, self.size))
             screen.blit(sprite, ((x+xoff)*self.size, (y+yoff)*self.size), self.surface.get_rect())
