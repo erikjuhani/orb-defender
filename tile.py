@@ -21,6 +21,9 @@ class Tile:
     def update(self, dt):
         self.surface.fill(self.color)
 
+    def return_rect(self):
+        return Rect(0, 0, self.size, self.size)
+
     def add_light(self, amount):
         if self.emit_light <= 1:
             self.emit_light += amount
@@ -97,7 +100,15 @@ class Tile:
                 for x in range(ox-4, ox+5):
                     for m in monsters:
                         if m.x == x and m.y == y and not m.flyer:
-                            level.bullets.append(Bullet(m.x, m.y, ox, oy, 3, self.size))
+                            level.bullets.append(Bullet(m.x, m.y, ox, oy, 3, True, self.size))
+                            self.cooldown = 4
+
+        if self.tile_name == 'Air_tower' and self.cooldown <= 0:
+            for y in range(oy-4, oy+5):
+                for x in range(ox-4, ox+5):
+                    for m in monsters:
+                        if m.x == x and m.y == y and m.flyer:
+                            level.bullets.append(Bullet(m.x, m.y, ox, oy, 3, False, self.size))
                             self.cooldown = 4
 
     def take_dmg(self, amount):

@@ -3,7 +3,7 @@ from pygame import draw
 import math
 
 class Bullet:
-    def __init__(self, targetx, targety, x, y, speed, size):
+    def __init__(self, targetx, targety, x, y, speed, melee, size):
         self.speed = speed
         self.x = x + 0.5
         self.y = y + 0.5
@@ -15,6 +15,7 @@ class Bullet:
         self.calc_movement()
         self.distance = 0
         self.dmg = 2
+        self.melee = melee
 
     def calc_movement(self):
         xv = self.tx - self.x

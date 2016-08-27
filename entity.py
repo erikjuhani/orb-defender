@@ -17,6 +17,9 @@ class Entity:
         if self.emit_light < 1:
             self.emit_light += amount
 
+    def return_rect(self):
+        return Rect(self.x, self.y, self.size, self.size)
+
     def change_brightness(self, amount, pixel=None, tint=None):
 
         amount = amount + self.emit_light
@@ -118,9 +121,14 @@ class Monster(Entity):
 
         for bullet in bullets:
             if int(bullet.x) >= int(self.x - 1) and int(bullet.x) <= int(self.x + 1) and int(bullet.y) >= int(self.y - 1) and int(bullet.y) <= int(self.y - 1):
-                dmg = bullet.dmg
-                bullets.remove(bullet)
-                continue
+                if bullet.melee and not self.flyer:
+                    dmg = bullet.dmg
+                    bullets.remove(bullet)
+                    continue
+                elif not bullet.melee and self.flyer:
+                    dmg = bullet.dmg
+                    bullets.remove(bullet)
+                    continue
 
         if dmg > 0:
             self.hp -= dmg

@@ -1,13 +1,37 @@
 from pygame import *
 
+texture_atlas = image.load('img/texture_atlas.png')
+sprite_size = 16
+
+def get_sprite(pos):
+    texture_atlas.set_clip(Rect(pos[0], pos[1], sprite_size, sprite_size))
+    return texture_atlas.subsurface(texture_atlas.get_clip())
+
+textures = {
+            'orb'       : get_sprite((0, 0)),
+            'tower1'    : get_sprite((2 * sprite_size, 0)),
+            'wall'      : get_sprite((1 * sprite_size, 0)),
+            'torch'     : get_sprite((4 * sprite_size, 0)),
+            'monster1'  : get_sprite((0, 1 * sprite_size)),
+            'monster2'  : get_sprite((1 * sprite_size, 1 * sprite_size)),
+            'monster3'  : get_sprite((2 * sprite_size, 1 * sprite_size)),
+            'monster4'  : get_sprite((3 * sprite_size, 1 * sprite_size)),
+            'bones'  : get_sprite((4 * sprite_size, 1 * sprite_size))
+          }
+
 class Sprite:
     def __init__(self, img):
-        self.img = image.load(img)
-        self.static_array = PixelArray(image.load(img))
+        self.img = Surface((sprite_size, sprite_size), 0, img)
+        self.static_array = PixelArray(img)
+
+#class Sprite:
+#    def __init__(self, img):
+#        self.img = image.load(img)
+#        self.static_array = PixelArray(image.load(img))
 
 ''' Static sprites '''
 
-orb = Sprite('img/orb.png')
+#orb = Sprite('img/orb.png')
 
 ''' pygame.surfarray.pixels2d(), manipulates the pixels, for rgb changes, no copying, faster '''
 
