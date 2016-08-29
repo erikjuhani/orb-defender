@@ -1,4 +1,7 @@
 from pygame import *
+from sprite import *
+
+import random
 
 class Entity:
     def __init__(self, x, y, hp, size, color, sprite):
@@ -9,7 +12,10 @@ class Entity:
         self.size = size
         self.color = color
         self.origc = color
+        self.remove = False
         self.sprite = sprite
+        if self.sprite != None:
+            self.draw_sprite = transform.scale(self.sprite.img, (self.size, self.size))
         self.surface = Surface((size, size))
         self.emit_light = 0
 
@@ -81,26 +87,26 @@ class Entity:
 
         del pixel_array
 
+        self.draw_sprite = transform.scale(self.sprite.img, (self.size, self.size))
+
     def update(self, dt):
         pass
 
     def draw(self, screen, xoff, yoff):
         #draw.rect(screen, self.color, ((self.x + xoff) * self.size, (self.y + yoff) * self.size, self.size, self.size))
-        sprite = transform.scale(self.sprite.img, (self.size, self.size))
-        screen.blit(sprite, ((self.x+xoff)*self.size, (self.y+yoff)*self.size), self.surface.get_rect())
-
-class Heart(Entity):
-    def __init__(self, x, y, hp, size, color):
-        super().__init__(x, y, hp, size, color)
-        self.passable = False
+        #sprite = transform.scale(self.sprite.img, (self.size, self.size))
+        screen.blit(self.draw_sprite, ((self.x+xoff)*self.size, (self.y+yoff)*self.size), self.surface.get_rect())
 
 class Monster(Entity):
-    def __init__(self, x, y, speed, hp, size, color, dmg, flyer, sprite):
+    def __init__(self, x, y, speed, hp, size, color, dmg, flyer, spawner, sprite):
         super(self.__class__, self).__init__(x, y, hp, size, color, sprite)
         self.speed = speed
         self.cooldown = 0
         self.dmg = dmg
         self.flyer = flyer
+        self.spawner = spawner
+        if self.spawner:
+            self.spawn_cooldown = 4
 
     def check_wall(self, level, locx, locy):
         if locx >= 0 and locx < level.map_size and locy >= 0 and locy < level.map_size:
@@ -116,38 +122,31 @@ class Monster(Entity):
         else:
             level.terrain_map[locx + locy * level.map_size].take_dmg(self.dmg)
 
-    def take_dmg(self, bullets):
-        dmg = 0
-
-        for bullet in bullets:
-            if int(bullet.x) >= int(self.x - 1) and int(bullet.x) <= int(self.x + 1) and int(bullet.y) >= int(self.y - 1) and int(bullet.y) <= int(self.y - 1):
-                if bullet.melee and not self.flyer:
-                    dmg = bullet.dmg
-                    bullets.remove(bullet)
-                    continue
-                elif not bullet.melee and self.flyer:
-                    dmg = bullet.dmg
-                    bullets.remove(bullet)
-                    continue
+    def take_dmg(self, dmg):
 
         if dmg > 0:
             self.hp -= dmg
 
-            r = self.origc[0]
-            g = self.origc[1]
-            b = self.origc[2]
-
-            r *= 1-dmg/self.full_hp
-            g *= 1-dmg/self.full_hp
-            b *= 1-dmg/self.full_hp
-
-            self.origc = (r , g, b)
-
     def update(self, dt):
         pass
 
+    def spawn_child(self, level):
+        x = random.randint(self.x-1, self.x+1)
+        y = random.randint(self.y-1, self.y+1)
+        level.monsters.append(Monster(x, y, random.randint(5, 7), 10, self.size, (114, 127, 79), 2, False, False, Sprite(textures['monster1'])))
+
     def simple_move(self, level, targetx, targety, dt):
         self.cooldown -= 1 * (self.speed/10) * dt
+
+        if self.spawner:
+            self.spawn_cooldown -= 1 * (self.speed/10) * dt
+
+            if self.spawn_cooldown < 0:
+                self.spawn_cooldown = 0
+
+            if self.spawn_cooldown == 0:
+                self.spawn_child(level)
+                self.spawn_cooldown = 5
 
         if self.cooldown < 0:
             self.cooldown = 0

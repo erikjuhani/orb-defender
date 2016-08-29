@@ -1,9 +1,13 @@
 from pygame import *
 from bullet import *
 
+import math
+
 class Tile:
-    def __init__(self, tile_name, color, size, sprite=None, hp=0, passable=True, light_source=False, tile_price=0):
+    def __init__(self, x, y, tile_name, color, size, sprite=None, hp=0, passable=True, light_source=False, tile_price=0):
         self.tile_name = tile_name
+        self.x = x
+        self.y = y
         self.hp = hp
         self.full_hp = hp
         self.color = color
@@ -14,7 +18,8 @@ class Tile:
         self.emit_light = 0
         self.cooldown = 0
         self.sprite = sprite
-
+        if self.sprite != None:
+            self.draw_sprite = transform.scale(self.sprite.img, (self.size, self.size))
         self.tile_price = tile_price
         self.surface = Surface((size, size))
 
@@ -85,10 +90,11 @@ class Tile:
 
         for y in range(size):
             for x in range(size):
-                pixel_array[x, y] = self.change_brightness(amount, self.sprite.img.unmap_rgb(self.sprite.static_array[x, y]), tint)
+                pixel_array[x, y] = self.change_brightness(amount, self.sprite.unmapped_rgb[x + y * size], tint)
 
         del pixel_array
 
+        self.draw_sprite = transform.scale(self.sprite.img, (self.size, self.size))
 
     def attack(self, ox, oy, level, monsters, dt):
         self.cooldown -= 1 * dt
@@ -96,38 +102,37 @@ class Tile:
             self.cooldown = 0
 
         if self.tile_name == 'Tower' and self.cooldown <= 0:
-            for y in range(oy-4, oy+5):
-                for x in range(ox-4, ox+5):
-                    for m in monsters:
-                        if m.x == x and m.y == y and not m.flyer:
-                            level.bullets.append(Bullet(m.x, m.y, ox, oy, 3, True, self.size))
-                            self.cooldown = 4
+            for m in monsters:
+                xv = m.x - ox
+                yv = m.y - oy
+                distance = math.sqrt(xv*xv + yv*yv)
 
-        if self.tile_name == 'Air_tower' and self.cooldown <= 0:
-            for y in range(oy-4, oy+5):
-                for x in range(ox-4, ox+5):
-                    for m in monsters:
-                        if m.x == x and m.y == y and m.flyer:
-                            level.bullets.append(Bullet(m.x, m.y, ox, oy, 3, False, self.size))
-                            self.cooldown = 4
+                if distance <= 5.1 and not m.flyer:
+                    level.bullets.append(Bullet(m.x, m.y, ox, oy, 3, 3, (0, 0, 255), True, self.size))
+                    self.cooldown = 4
+                    break
+
+        if self.tile_name == 'Air tower' and self.cooldown <= 0:
+            for m in monsters:
+                xv = m.x - ox
+                yv = m.y - oy
+                distance = math.sqrt(xv*xv + yv*yv)
+
+                if distance <= 4.1 and m.flyer:
+                    level.bullets.append(Bullet(m.x, m.y, ox, oy, 3, 4, (0, 255, 0), False, self.size))
+                    self.cooldown = 6
+                    break
 
     def take_dmg(self, amount):
         self.hp -= amount
 
-        r = self.origc[0]
-        g = self.origc[1]
-        b = self.origc[2]
-
-        r *= 1-amount/self.full_hp
-        g *= 1-amount/self.full_hp
-        b *= 1-amount/self.full_hp
-
-        self.origc = (r , g, b)
+        self.change_img_brightness(self.hp/self.full_hp)
 
     def draw(self, screen, x, y, xoff, yoff):
-
         #draw.rect(screen, self.color, ((x+xoff)*self.size, (y+yoff)*self.size, self.size, self.size))
-        screen.blit(self.surface, ((x+xoff)*self.size, (y+yoff)*self.size))
-        if not self.sprite == None:
-            sprite = transform.scale(self.sprite.img, (self.size, self.size))
-            screen.blit(sprite, ((x+xoff)*self.size, (y+yoff)*self.size), self.surface.get_rect())
+        if self.sprite != None:
+            #sprite = transform.scale(self.sprite.img, (self.size, self.size))
+            screen.blit(self.surface, ((x+xoff)*self.size, (y+yoff)*self.size))
+            screen.blit(self.draw_sprite, ((x+xoff)*self.size, (y+yoff)*self.size), self.surface.get_rect())
+        else:
+            screen.blit(self.surface, ((x+xoff)*self.size, (y+yoff)*self.size))

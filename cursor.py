@@ -10,9 +10,11 @@ class Cursor:
         self.cooldown = 0
         self.block = 0
         self.menu_switch = {'Build' : True}
-        self.menu_block = {0 : 'Wall',
-                 1 : 'Tower',
-                 2 : 'Torch'}
+        self.menu_block = {
+                            0 : 'Wall',
+                            1 : 'Tower',
+                            2 : 'Air tower',
+                            3 : 'Torch'}
 
     def check_border(self, level, location):
         if location < 0 or location >= level.map_size:
@@ -41,7 +43,7 @@ class Cursor:
 
                 if KEY_DICT[key] == 'block':
                     self.block += 1
-                    if self.block > 2:
+                    if self.block >= len(self.menu_block):
                         self.block = 0
 
                 if KEY_DICT[key] == 'action':

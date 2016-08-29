@@ -6,7 +6,7 @@ from gui import *
 
 ''' Game configs '''
 SCALE = 3   # Scalar, which determines how the game is scaled. Basicly it's a multiplier.
-FPS = 30    # Frames per second
+FPS = 60    # Frames per second
 TILE_SIZE = 16 * SCALE # Changes how big are the elements in the game world.
 MAP_SIZE = 32 # Determines the size of the playable map area. min 20. Odd numbers prefered.
 
@@ -14,7 +14,7 @@ class Game:
     def __init__(self):
         self.screen = display.get_surface()
         self.screen_rect = self.screen.get_rect()
-        self.background = Surface(self.screen.get_size()).convert()
+        self.bg = Surface(self.screen.get_size()).convert()
         self.clock = time.Clock()
         self.keys = key.get_pressed()
         self.level = Level(MAP_SIZE, TILE_SIZE)
@@ -43,7 +43,7 @@ class Game:
             self.menu.update(self, self.keys, dt)
 
     def render(self):
-        self.screen.blit(self.background, (0,0))
+        self.screen.blit(self.bg, (0,0))
         if self.menu.game_state:
             self.level.draw(self.screen, self.camera.x, self.camera.y)
             self.cursor.draw(self.screen, self.camera.x, self.camera.y)

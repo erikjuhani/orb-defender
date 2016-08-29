@@ -1,6 +1,6 @@
 class Clock:
     def __init__(self, hours, minutes, speed, sun_delay):
-        self.days = 1
+        self.days = 0
         self.hours = hours
         self.minutes = minutes
         self.speed = speed
