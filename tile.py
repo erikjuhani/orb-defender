@@ -108,8 +108,8 @@ class Tile:
                 distance = math.sqrt(xv*xv + yv*yv)
 
                 if distance <= 5.1 and not m.flyer:
-                    level.bullets.append(Bullet(m.x, m.y, ox, oy, 3, 3, (0, 0, 255), True, self.size))
-                    self.cooldown = 4
+                    level.bullets.append(Bullet(m.x, m.y, ox, oy, 3, 10, (0, 0, 255), True, self.size))
+                    self.cooldown = 6
                     break
 
         if self.tile_name == 'Air tower' and self.cooldown <= 0:
@@ -118,9 +118,9 @@ class Tile:
                 yv = m.y - oy
                 distance = math.sqrt(xv*xv + yv*yv)
 
-                if distance <= 4.1 and m.flyer:
-                    level.bullets.append(Bullet(m.x, m.y, ox, oy, 3, 4, (0, 255, 0), False, self.size))
-                    self.cooldown = 6
+                if distance <= 3.1:
+                    level.bullets.append(Bullet(m.x, m.y, ox, oy, 4, 0.4, (0, 255, 0), True, self.size))
+                    self.cooldown = 0.4
                     break
 
     def take_dmg(self, amount):

@@ -17,8 +17,8 @@ class Level:
         self.monsters = []
         self.bullets = []
         self.generate_level()
-        self.game_clock = Clock(18, 0, 40, 6)
-        self.brightness_layer = 1.0
+        self.game_clock = Clock(6, 0, 60, 6)
+        self.brightness_layer = 0.0
         self.game_start = True
         self.gold = 40
         for key in textures:
@@ -31,8 +31,8 @@ class Level:
         self.monsters = []
         self.bullets = []
         self.generate_level()
-        self.game_clock = Clock(6, 0, 20, 6)
-        self.brightness_layer = 1.0
+        self.game_clock = Clock(6, 0, 40, 6)
+        self.brightness_layer = 0.0
         self.game_start = True
         self.gold = 40
 
@@ -41,10 +41,10 @@ class Level:
         tile = None
 
         if tile_name == 'Tower':
-            tile = Tile(x, y, 'Tower', (244, 219, 168), self.tile_size, Sprite(textures['tower1']), 4, False, False, 10)
+            tile = Tile(x, y, 'Tower', (244, 219, 168), self.tile_size, Sprite(textures['tower1']), 4, False, False, 40)
             self.gold -= tile.tile_price
         elif tile_name == 'Air tower':
-            tile = Tile(x, y, 'Air tower', (244, 219, 168), self.tile_size, Sprite(textures['tower2']), 4, False, False, 15)
+            tile = Tile(x, y, 'Air tower', (244, 219, 168), self.tile_size, Sprite(textures['tower2']), 4, False, False, 10)
             self.gold -= tile.tile_price
         elif tile_name == 'Wall':
             tile = Tile(x, y, 'Wall', (244, 219, 168), self.tile_size, Sprite(textures['wall']), 20, False, False, 5)
@@ -161,9 +161,7 @@ class Level:
                 self.light_tile(tile.x, tile.y)
             else:
                 tile.emit_light = 0
-
-            if tile.emit_light < 1:
-                tile.update(dt)
+            tile.update(dt)
 
         self.game_clock.tick(dt)
 
@@ -172,11 +170,8 @@ class Level:
         else:
             self.brightness_layer += ((1 / self.game_clock.sun_delay / 60) * self.game_clock.speed) * dt
 
-        if self.game_start and self.game_clock.hours == 6:
-            self.brightness_layer = 0.0
-            self.game_start = False
-        elif self.game_clock.hours == 9 and self.game_clock.minutes == 0:
-            self.gold += self.game_clock.days * 10
+        if self.game_clock.hours == 9 and self.game_clock.minutes == 0:
+            self.gold += self.game_clock.days * 5
 
         if self.brightness_layer > 1:
             self.brightness_layer = 1
@@ -192,11 +187,13 @@ class Level:
             for j in range(len(self.bullets)):
                 bullet = self.bullets[j]
                 dmg = 0
-                if int(bullet.x) >= int(monster.x - 1) and int(monster.x) <= int(monster.x + 1) and int(bullet.y) >= int(monster.y - 1) and int(bullet.y) <= int(monster.y - 1):
+                collide_x = abs(bullet.x-monster.x)
+                collide_y = abs(bullet.y-monster.y)
+                if collide_x < 0.5 and collide_y < 0.5:
                     if bullet.melee and not monster.flyer:
                         dmg = bullet.dmg
                         self.bullets[j].remove = True
-                    elif not bullet.melee and monster.flyer:
+                    elif bullet.melee and monster.flyer:
                         dmg = bullet.dmg
                         self.bullets[j].remove = True
                 self.monsters[i].take_dmg(dmg)

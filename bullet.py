@@ -5,8 +5,8 @@ import math
 class Bullet:
     def __init__(self, targetx, targety, x, y, speed, dmg, color, melee, size):
         self.speed = speed
-        self.x = x + 0.5
-        self.y = y + 0.5
+        self.x = int(x + 0.5)
+        self.y = int(y + 0.5)
         self.tx = targetx
         self.ty = targety
         self.size = size
@@ -31,4 +31,4 @@ class Bullet:
         self.y += self.dir_y * self.speed * dt
 
     def draw(self, screen, xoff, yoff):
-        draw.ellipse(screen, self.color, ((self.x+xoff) * self.size, (self.y+yoff) * self.size, self.size/2-1, self.size/2-1))
+        draw.ellipse(screen, self.color, ((self.x+xoff) * self.size, (self.y+yoff) * self.size, self.size//2-1, self.size//2-1))

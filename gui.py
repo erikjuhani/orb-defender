@@ -94,7 +94,13 @@ class Game_gui:
         self.block = 0
         self.gold = level.gold
         self.paused = False
-        self.current_block = (0, 0, 0)
+        self.blocks = {
+                        'Wall' : transform.scale(textures['wall'],(textures['wall'].get_width()*3, textures['wall'].get_height()*3)),
+                        'Tower': transform.scale(textures['tower1'],(textures['tower1'].get_width()*3, textures['tower1'].get_height()*3)),
+                        'Air tower' : transform.scale(textures['tower2'],(textures['tower2'].get_width()*3, textures['tower2'].get_height()*3)),
+                        'Torch' : transform.scale(textures['torch'],(textures['torch'].get_width()*3, textures['torch'].get_height()*3)),
+                    }
+        self.current_block = self.blocks['Wall']
 
     def change_block(self):
         pass
@@ -121,31 +127,24 @@ class Game_gui:
                     self.paused = not self.paused
                 if KEY_DICT[key] == 'switch' and level.heart_hp <= 0:
                     level.restart_level()
-                    cursor.x = int(level.map_size/2)
-                    cursor.y = int(level.map_size/2)
+                    cursor.x = level.map_size//2
+                    cursor.y = level.map_size//2
                 if KEY_DICT[key] == 'escape' and self.paused:
                     level.restart_level()
-                    cursor.x = int(level.map_size/2)
-                    cursor.y = int(level.map_size/2)
+                    cursor.x = level.map_size//2
+                    cursor.y = level.map_size//2
                     menu.game_state = False
                     self.paused = False
 
         self.identifier(cursor.x, cursor.y, level.monsters)
         if level.gold < self.gold or level.gold > self.gold:
             self.gold = level.gold
-        if cursor.menu_block[cursor.block] == 'Wall':
-            self.current_block = (60, 50, 33)
-        elif cursor.menu_block[cursor.block] == 'Tower':
-            self.current_block = (60, 100, 33)
-        elif cursor.menu_block[cursor.block] == 'Air tower':
-            self.current_block = (255, 100, 33)
-        elif cursor.menu_block[cursor.block] == 'Torch':
-            self.current_block = (255, 255, 255)
+        self.current_block = self.blocks[cursor.menu_block[cursor.block]]
 
 
     def draw(self, screen):
         draw.rect(screen, (0, 0, 0), (self.x, self.y, self.width, self.size))
-        draw.rect(screen, self.current_block, (self.width-self.size*2, self.y, self.size, self.size))
+        screen.blit(self.current_block, (self.width-self.size*2, self.y, self.size, self.size))
         draw.ellipse(screen, (255, 255, 0), (self.x + self.size/3, self.y+self.size/3-1, self.size/2-1, self.size/2-1))
         screen.blit(self.draw_msg(self.gold), (self.x + self.size, self.size//4))
         screen.blit(self.draw_msg(self.current_i), (self.x + self.size*4, self.size//4))
