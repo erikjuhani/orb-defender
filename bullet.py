@@ -24,8 +24,12 @@ class Bullet:
         xv = self.tx - self.x
         yv = self.ty - self.y
         self.distance = math.sqrt(xv*xv + yv*yv)
-        self.dir_x = xv/self.distance
-        self.dir_y = yv/self.distance
+        if self.distance == 0:
+            self.dir_x = xv
+            self.dir_y = yv
+        else:
+            self.dir_x = xv/self.distance
+            self.dir_y = yv/self.distance
 
     def update(self, dt):
         self.x += self.dir_x * self.speed * dt

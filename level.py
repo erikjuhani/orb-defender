@@ -24,7 +24,7 @@ class Level:
         self.game_clock = Clock(6, 0, 60, 6)
         self.brightness_layer = 0.0
         self.game_start = True
-        self.gold = 50
+        self.gold = 60
         for key in textures:
             textures[key].convert()
 
@@ -38,7 +38,7 @@ class Level:
         self.game_clock = Clock(6, 0, 60, 6)
         self.brightness_layer = 0.0
         self.game_start = True
-        self.gold = 40
+        self.gold = 60
 
     def create_tile(self, x, y, tile_name):
 
