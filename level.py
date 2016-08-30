@@ -7,6 +7,10 @@ from sprite import *
 
 import math
 
+DEFAULT_CLOCK = 6, 0, 10, 6
+FAST_CLOCK = 6, 0, 60, 6
+REAL_CLOCK = 6, 0, 1, 6
+
 class Level:
     def __init__(self, map_size, tile_size):
         self.map_size = map_size
@@ -20,7 +24,7 @@ class Level:
         self.game_clock = Clock(6, 0, 60, 6)
         self.brightness_layer = 0.0
         self.game_start = True
-        self.gold = 40
+        self.gold = 50
         for key in textures:
             textures[key].convert()
 
@@ -31,7 +35,7 @@ class Level:
         self.monsters = []
         self.bullets = []
         self.generate_level()
-        self.game_clock = Clock(6, 0, 40, 6)
+        self.game_clock = Clock(6, 0, 60, 6)
         self.brightness_layer = 0.0
         self.game_start = True
         self.gold = 40
@@ -40,16 +44,16 @@ class Level:
 
         tile = None
 
-        if tile_name == 'Tower':
+        if tile_name == 'Tower' and self.gold - 40 >= 0:
             tile = Tile(x, y, 'Tower', (244, 219, 168), self.tile_size, Sprite(textures['tower1']), 4, False, False, 40)
             self.gold -= tile.tile_price
-        elif tile_name == 'Air tower':
+        elif tile_name == 'Air tower' and self.gold - 10 >= 0:
             tile = Tile(x, y, 'Air tower', (244, 219, 168), self.tile_size, Sprite(textures['tower2']), 4, False, False, 10)
             self.gold -= tile.tile_price
-        elif tile_name == 'Wall':
+        elif tile_name == 'Wall' and self.gold - 5 >= 0:
             tile = Tile(x, y, 'Wall', (244, 219, 168), self.tile_size, Sprite(textures['wall']), 20, False, False, 5)
             self.gold -= tile.tile_price
-        elif tile_name == 'Torch':
+        elif tile_name == 'Torch' and self.gold - 2 >= 0:
             tile = Tile(x, y, 'Torch', (244, 219, 168), self.tile_size, Sprite(textures['torch']), 2, False, True, 2)
             self.gold -= tile.tile_price
         else:
@@ -170,8 +174,12 @@ class Level:
         else:
             self.brightness_layer += ((1 / self.game_clock.sun_delay / 60) * self.game_clock.speed) * dt
 
-        if self.game_clock.hours == 9 and self.game_clock.minutes == 0:
-            self.gold += self.game_clock.days * 5
+        if self.game_clock.hours == 9 and self.game_clock.minutes < 1:
+            if self.game_clock.days < 6:
+                self.gold += (self.game_clock.days-1) * 5
+            else:
+                self.gold += 30
+            self.game_start = False
 
         if self.brightness_layer > 1:
             self.brightness_layer = 1
@@ -214,7 +222,7 @@ class Level:
             bullet.update(dt)
             x = bullet.x
             y = bullet.y
-            if x < 0 or x >= self.map_size or y < 0 or y >= self.map_size:
+            if x < 0 or x >= self.map_size or y < 0 or y >= self.map_size or bullet.timer <= 0:
                 self.bullets[i].remove = True
                 continue
 

@@ -107,8 +107,8 @@ class Tile:
                 yv = m.y - oy
                 distance = math.sqrt(xv*xv + yv*yv)
 
-                if distance <= 5.1 and not m.flyer:
-                    level.bullets.append(Bullet(m.x, m.y, ox, oy, 3, 10, (0, 0, 255), True, self.size))
+                if distance <= 5.5 and not m.flyer:
+                    level.bullets.append(Bullet(m.x, m.y, ox, oy, 3, 10, (0, 0, 255), True, self.size, 5))
                     self.cooldown = 6
                     break
 
@@ -118,8 +118,8 @@ class Tile:
                 yv = m.y - oy
                 distance = math.sqrt(xv*xv + yv*yv)
 
-                if distance <= 3.1:
-                    level.bullets.append(Bullet(m.x, m.y, ox, oy, 4, 0.4, (0, 255, 0), True, self.size))
+                if distance <= 3.5:
+                    level.bullets.append(Bullet(m.x, m.y, ox, oy, 4, 0.4, (0, 255, 0), True, self.size, 2))
                     self.cooldown = 0.4
                     break
 

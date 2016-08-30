@@ -3,7 +3,7 @@ from pygame import draw
 import math
 
 class Bullet:
-    def __init__(self, targetx, targety, x, y, speed, dmg, color, melee, size):
+    def __init__(self, targetx, targety, x, y, speed, dmg, color, melee, size, timer):
         self.speed = speed
         self.x = int(x + 0.5)
         self.y = int(y + 0.5)
@@ -18,6 +18,7 @@ class Bullet:
         self.melee = melee
         self.color = color
         self.remove = False
+        self.timer = timer
 
     def calc_movement(self):
         xv = self.tx - self.x
@@ -29,6 +30,7 @@ class Bullet:
     def update(self, dt):
         self.x += self.dir_x * self.speed * dt
         self.y += self.dir_y * self.speed * dt
+        self.timer -= 1 * self.speed * dt
 
     def draw(self, screen, xoff, yoff):
         draw.ellipse(screen, self.color, ((self.x+xoff) * self.size, (self.y+yoff) * self.size, self.size//2-1, self.size//2-1))
