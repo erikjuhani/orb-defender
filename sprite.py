@@ -82,6 +82,7 @@ textures = {
             'tower1'    : get_sprite((2 * sprite_size, 0)),
             'tower2'    : get_sprite((3 * sprite_size, 0)),
             'torch'     : get_sprite((4 * sprite_size, 0)),
+            'farm'      : get_sprite((5 * sprite_size, 0)),
             'monster1'  : get_sprite((0, 1 * sprite_size)),
             'monster2'  : get_sprite((1 * sprite_size, 1 * sprite_size)),
             'monster3'  : get_sprite((2 * sprite_size, 1 * sprite_size)),

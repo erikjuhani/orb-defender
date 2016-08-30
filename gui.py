@@ -106,10 +106,13 @@ class Game_gui:
                         'Tower': transform.scale(textures['tower1'],(textures['tower1'].get_width()*3, textures['tower1'].get_height()*3)),
                         'Air tower' : transform.scale(textures['tower2'],(textures['tower2'].get_width()*3, textures['tower2'].get_height()*3)),
                         'Torch' : transform.scale(textures['torch'],(textures['torch'].get_width()*3, textures['torch'].get_height()*3)),
+                        'Farm' : transform.scale(textures['farm'],(textures['farm'].get_width()*3, textures['farm'].get_height()*3)),
                     }
         self.current_block = self.blocks['Wall']
         self.cooldown = 0
         self.splash = 0
+        self.gold_cooldown = 0
+        self.gold_msg = ''
         self.splash_msg = ''
         self.days = level.game_clock.days
 
@@ -127,6 +130,10 @@ class Game_gui:
         msg_surf = convert_string(str(msg))
         return transform.scale(msg_surf, (msg_surf.get_width()*3, msg_surf.get_height()*3))
 
+    def draw_gold(self, msg):
+        self.gold_cooldown = 0.8
+        self.gold_msg = msg
+
     def draw_splash(self, msg):
         self.splash = 6
         self.splash_msg = msg
@@ -142,6 +149,11 @@ class Game_gui:
             self.splash -= 1 * dt
         if self.splash < 0:
             self.splash = 0
+
+        if self.gold_cooldown > 0:
+            self.gold_cooldown -= 1 * dt
+        if self.gold_cooldown < 0:
+            self.gold_cooldown = 0
 
         for key in KEY_DICT:
             if keys[key] and self.cooldown == 0:
@@ -164,6 +176,12 @@ class Game_gui:
                 self.cooldown = 0.2
 
         self.identifier(cursor.x, cursor.y, level.monsters)
+
+        if self.gold < level.gold:
+            self.draw_gold('+' + str(level.gold - self.gold))
+        elif self.gold > level.gold:
+            self.draw_gold('-' + str(self.gold - level.gold))
+
         if level.gold < self.gold or level.gold > self.gold:
             self.gold = level.gold
         self.current_block = self.blocks[cursor.menu_block[cursor.block]]
@@ -175,15 +193,18 @@ class Game_gui:
     def draw(self, screen):
         draw.rect(screen, (0, 0, 0), (0, 0, self.width, self.size))
         screen.blit(self.current_block, (self.width-self.size*2, self.y, self.size, self.size))
-        draw.ellipse(screen, (255, 255, 0), (self.size//3, self.y+self.size//3-1, self.size//2-1, self.size//2-1))
+        draw.ellipse(screen, (255, 255, 0), (self.size//3, self.size//3-1, self.size//2-1, self.size//2-1))
         screen.blit(self.draw_msg(self.gold), (self.size, self.size//4))
         screen.blit(self.draw_msg(self.current_i), (self.size*4, self.size//4))
-        screen.blit(self.draw_msg(self.level.heart_hp), (self.size*8, self.size//4))
+        screen.blit(self.draw_msg(int(self.level.heart_hp)), (self.size*8, self.size//4))
         if self.paused:
             screen.blit(self.draw_msg('GAME PAUSED'), (self.size*8, self.size//4))
 
         if self.splash > 0:
             screen.blit(self.draw_msg(self.splash_msg), (self.size*7, self.size*2))
+
+        if self.gold_cooldown > 0:
+            screen.blit(self.draw_msg(self.gold_msg), (self.size*1.5, self.size))
 
         if self.level.heart_hp <= 0:
             lost_msg = 'Your kingdom has fallen on:'

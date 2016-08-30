@@ -14,7 +14,8 @@ class Cursor:
                             0 : 'Wall',
                             1 : 'Tower',
                             2 : 'Air tower',
-                            3 : 'Torch'}
+                            3 : 'Torch',
+                            4 : 'Farm'}
 
     def check_border(self, level, location):
         if location < 0 or location >= level.map_size:
@@ -38,8 +39,9 @@ class Cursor:
                         self.y -= self.speed
                 if KEY_DICT[key] == 'down' and self.check_border(level, self.y + self.speed):
                         self.y += self.speed
-                if KEY_DICT[key] == 'switch':
-                    self.menu_switch['Build'] = not self.menu_switch['Build']
+                # Toggles between building / building removal
+                #if KEY_DICT[key] == 'switch':
+                #    self.menu_switch['Build'] = not self.menu_switch['Build']
 
                 if KEY_DICT[key] == 'block':
                     self.block += 1

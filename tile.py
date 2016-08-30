@@ -16,7 +16,10 @@ class Tile:
         self.passable = passable
         self.light_source = light_source
         self.emit_light = 0
-        self.cooldown = 0
+        if tile_name == 'Farm':
+            self.cooldown = 30
+        else:
+            self.cooldown = 0
         self.sprite = sprite
         if self.sprite != None:
             self.draw_sprite = transform.scale(self.sprite.img, (self.size, self.size))
@@ -25,6 +28,9 @@ class Tile:
 
     def update(self, dt):
         self.surface.fill(self.color)
+        self.cooldown -= 1 * dt
+        if self.cooldown < 0:
+            self.cooldown = 0
 
     def return_rect(self):
         return Rect(0, 0, self.size, self.size)
@@ -97,9 +103,6 @@ class Tile:
         self.draw_sprite = transform.scale(self.sprite.img, (self.size, self.size))
 
     def attack(self, ox, oy, level, monsters, dt):
-        self.cooldown -= 1 * dt
-        if self.cooldown < 0:
-            self.cooldown = 0
 
         if self.tile_name == 'Tower' and self.cooldown <= 0:
             for m in monsters:
@@ -122,6 +125,11 @@ class Tile:
                     level.bullets.append(Bullet(m.x, m.y, ox, oy, 4, 0.4, (0, 255, 0), True, self.size, 2))
                     self.cooldown = 0.4
                     break
+
+        if self.tile_name == 'Farm' and self.cooldown <= 0:
+            level.gold += 5
+            self.cooldown = 30
+
 
     def take_dmg(self, amount):
         self.hp -= amount

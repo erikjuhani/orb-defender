@@ -21,7 +21,7 @@ class Level:
         self.monsters = []
         self.bullets = []
         self.generate_level()
-        self.game_clock = Clock(6, 0, 60, 6)
+        self.game_clock = Clock(6, 0, 20, 6)
         self.brightness_layer = 0.0
         self.game_start = True
         self.gold = 60
@@ -35,7 +35,7 @@ class Level:
         self.monsters = []
         self.bullets = []
         self.generate_level()
-        self.game_clock = Clock(6, 0, 60, 6)
+        self.game_clock = Clock(6, 0, 20, 6)
         self.brightness_layer = 0.0
         self.game_start = True
         self.gold = 60
@@ -45,7 +45,7 @@ class Level:
         tile = None
 
         if tile_name == 'Tower' and self.gold - 40 >= 0:
-            tile = Tile(x, y, 'Tower', (244, 219, 168), self.tile_size, Sprite(textures['tower1']), 4, False, False, 40)
+            tile = Tile(x, y, 'Tower', (244, 219, 168), self.tile_size, Sprite(textures['tower1']), 8, False, False, 40)
             self.gold -= tile.tile_price
         elif tile_name == 'Air tower' and self.gold - 10 >= 0:
             tile = Tile(x, y, 'Air tower', (244, 219, 168), self.tile_size, Sprite(textures['tower2']), 4, False, False, 10)
@@ -55,6 +55,9 @@ class Level:
             self.gold -= tile.tile_price
         elif tile_name == 'Torch' and self.gold - 2 >= 0:
             tile = Tile(x, y, 'Torch', (244, 219, 168), self.tile_size, Sprite(textures['torch']), 2, False, True, 2)
+            self.gold -= tile.tile_price
+        elif tile_name == 'Farm' and self.gold - 50 >= 0:
+            tile = Tile(x, y, 'Farm', (244, 219, 168), self.tile_size, Sprite(textures['farm']), 10, False, False, 50)
             self.gold -= tile.tile_price
         else:
             tile = Tile(x, y, 'Sand', (244, 219, 168), self.tile_size)
@@ -174,11 +177,11 @@ class Level:
         else:
             self.brightness_layer += ((1 / self.game_clock.sun_delay / 60) * self.game_clock.speed) * dt
 
-        if self.game_clock.hours == 9 and self.game_clock.minutes < 1:
-            if self.game_clock.days < 6:
+        if self.game_clock.hours == 9 and self.game_clock.minutes == 0:
+            if self.game_clock.days < 3:
                 self.gold += (self.game_clock.days-1) * 5
             else:
-                self.gold += 30
+                self.gold += 20
             self.game_start = False
 
         if self.brightness_layer > 1:
