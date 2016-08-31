@@ -1,5 +1,7 @@
 import math
 
+''' Creates the map offsets and rendered boundaries. '''
+
 class Camera:
     def __init__(self, screen_rect, size, follx, folly):
         self.screen_rect = screen_rect

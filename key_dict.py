@@ -1,5 +1,7 @@
 from pygame import *
 
+''' The key atlas, mapped keys for events. '''
+
 KEY_DICT = {
             K_a     : 'left',
             K_d     : 'right',

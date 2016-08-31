@@ -3,6 +3,8 @@ from sprite import *
 
 import random
 
+''' Holds the entity class, only monster class is used for now. '''
+
 class Entity:
     def __init__(self, x, y, hp, size, color, sprite):
         self.x = int(x)
@@ -27,6 +29,8 @@ class Entity:
         return Rect(self.x, self.y, self.size, self.size)
 
     def change_brightness(self, amount, pixel=None, tint=None):
+
+        ''' Changes the rgb values by each pixel '''
 
         amount = amount + self.emit_light
 
@@ -78,23 +82,24 @@ class Entity:
 
     def change_img_brightness(self, amount, tint=None):
 
+        ''' Creates an array of integers from the sprite '''
         pixel_array = PixelArray(self.sprite.img)
         size = len(pixel_array)
 
+        ''' Goes through all the pixels of the image.
+        Unmapping them and changing the rgb values.
+        Uses static array of the image for
+        keeping the original color values.'''
         for y in range(size):
             for x in range(size):
                 pixel_array[x, y] = self.change_brightness(amount, self.sprite.img.unmap_rgb(self.sprite.static_array[x, y]), tint)
 
         del pixel_array
 
+        ''' Scales the image '''
         self.draw_sprite = transform.scale(self.sprite.img, (self.size, self.size))
 
-    def update(self, dt):
-        pass
-
     def draw(self, screen, xoff, yoff):
-        #draw.rect(screen, self.color, ((self.x + xoff) * self.size, (self.y + yoff) * self.size, self.size, self.size))
-        #sprite = transform.scale(self.sprite.img, (self.size, self.size))
         screen.blit(self.draw_sprite, ((self.x+xoff)*self.size, (self.y+yoff)*self.size), self.surface.get_rect())
 
 class Monster(Entity):
@@ -103,32 +108,32 @@ class Monster(Entity):
         self.speed = speed
         self.cooldown = 0
         self.dmg = dmg
-        self.flyer = flyer
+        self.flyer = flyer # This variable enables the entity to pass over objects
         self.spawner = spawner
         if self.spawner:
-            self.spawn_cooldown = 4
+            self.spawn_cooldown = 2
 
     def check_wall(self, level, locx, locy):
+        ''' Checks the next tile the entity is heading,
+        if it is passable or not '''
         if locx >= 0 and locx < level.map_size and locy >= 0 and locy < level.map_size:
-            if level.terrain_map[locx + locy * level.map_size].tile_name == 'Heart':
+            if level.terrain_map[locx + locy * level.map_size].tile_name == 'Orb':
                 return False
             elif not level.terrain_map[locx + locy * level.map_size].passable and not self.flyer:
                 return False
         return True
 
     def do_attack(self, level, locx, locy, dt):
-        if self.flyer and level.terrain_map[locx + locy * level.map_size].tile_name == 'Heart':
+        ''' If check_wall returns true,
+        hits the unpassable object '''
+        if self.flyer and level.terrain_map[locx + locy * level.map_size].tile_name == 'Orb':
             level.terrain_map[locx + locy * level.map_size].take_dmg(self.dmg)
         else:
             level.terrain_map[locx + locy * level.map_size].take_dmg(self.dmg)
 
     def take_dmg(self, dmg):
-
         if dmg > 0:
             self.hp -= dmg
-
-    def update(self, dt):
-        pass
 
     def spawn_child(self, level):
         x = random.randint(self.x-1, self.x+1)
@@ -136,6 +141,7 @@ class Monster(Entity):
         level.monsters.append(Monster(x, y, random.randint(5, 7), 10, self.size, (114, 127, 79), 2, False, False, Sprite(textures['monster1'])))
 
     def simple_move(self, level, targetx, targety, dt):
+        ''' Very crude AI. Basicly just moves towards the target.'''
         self.cooldown -= 1 * (self.speed/10) * dt
 
         if self.spawner:
@@ -146,7 +152,7 @@ class Monster(Entity):
 
             if self.spawn_cooldown == 0:
                 self.spawn_child(level)
-                self.spawn_cooldown = 5
+                self.spawn_cooldown = 2
 
         if self.cooldown < 0:
             self.cooldown = 0

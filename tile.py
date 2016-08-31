@@ -41,6 +41,8 @@ class Tile:
 
     def change_brightness(self, amount, pixel=None, tint=None):
 
+        ''' Changes the rgb values by each pixel '''
+
         amount = amount + self.emit_light
 
         if pixel == None:
@@ -90,21 +92,29 @@ class Tile:
             return int(r), int(g), int(b), a
 
     def change_img_brightness(self, amount, tint=None):
-
+        ''' Creates an array of integers from the sprite '''
         pixel_array = PixelArray(self.sprite.img)
         size = len(pixel_array)
 
+        ''' Goes through all the pixels of the image.
+        Unmapping them and changing the rgb values.
+        Uses static array of the image for
+        keeping the original color values.'''
         for y in range(size):
             for x in range(size):
                 pixel_array[x, y] = self.change_brightness(amount, self.sprite.unmapped_rgb[x + y * size], tint)
 
         del pixel_array
 
+        ''' Scales the image '''
         self.draw_sprite = transform.scale(self.sprite.img, (self.size, self.size))
 
     def attack(self, ox, oy, level, monsters, dt):
 
-        if self.tile_name == 'Tower' and self.cooldown <= 0:
+        ''' Determines when to interact with other objects/monsters
+        and type of attack it the tile uses.'''
+
+        if self.tile_name == 'Heavy tower' and self.cooldown <= 0:
             for m in monsters:
                 xv = m.x - ox
                 yv = m.y - oy
@@ -115,7 +125,7 @@ class Tile:
                     self.cooldown = 6
                     break
 
-        if self.tile_name == 'Air tower' and self.cooldown <= 0:
+        if self.tile_name == 'Light tower' and self.cooldown <= 0:
             for m in monsters:
                 xv = m.x - ox
                 yv = m.y - oy
@@ -130,16 +140,12 @@ class Tile:
             level.gold += 5
             self.cooldown = 30
 
-
     def take_dmg(self, amount):
         self.hp -= amount
-
         self.change_img_brightness(self.hp/self.full_hp)
 
     def draw(self, screen, x, y, xoff, yoff):
-        #draw.rect(screen, self.color, ((x+xoff)*self.size, (y+yoff)*self.size, self.size, self.size))
         if self.sprite != None:
-            #sprite = transform.scale(self.sprite.img, (self.size, self.size))
             screen.blit(self.surface, ((x+xoff)*self.size, (y+yoff)*self.size))
             screen.blit(self.draw_sprite, ((x+xoff)*self.size, (y+yoff)*self.size), self.surface.get_rect())
         else:

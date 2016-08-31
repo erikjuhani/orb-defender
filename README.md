@@ -1,13 +1,34 @@
-# The Fortress Heart
+ORB DEFENDER
 A python 2d game, mixed with tower defense and survival elements.
 
-# TODO
-  * ~~Game class and basic window and key handling~~
-  * ~~Cursor/Player~~
-  * Map and terrain generation
-  * Level and tile class
-  * Pathfinding algorithm
-  * Day and night system
-  * Game gui
-  * Main menu
-  * Monster class
+Made with python and pygame.
+
+MAIN OBJECTIVES:
+Protect the orb.
+Build walls, towers and farms.
+Survive the hordes of enemies as long as you can.
+
+CONTROLS:
+<kbd>Arrow</kbd> keys, or
+(<kbd>W</kbd>, <kbd>A</kbd>, <kbd>S</kbd>, <kbd>D</kbd>) for direction
+
+<kbd>Return</kbd> key or
+<kbd>E</kbd> for placing blocks
+
+<kbd>R</kbd> for restart
+<kbd>F</kbd> for changing blocks
+
+<kbd>Escape</kbd> key or
+<kbd>Q</kbd> for quitting the game
+
+FEATURES:
+  * Day & Night system
+  * Five different building types
+  * Four variety of monsters
+  * Waves become more intense every night
+
+FEATURES THAT DIDNT MAKE IT:
+  * A* algorithm, real pathfinding
+  * Terrain generation
+  * Critters
+  * Performance optimizations

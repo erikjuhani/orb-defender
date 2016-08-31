@@ -1,6 +1,8 @@
 from pygame import *
 from key_dict import *
 
+''' The player class '''
+
 class Cursor:
     def __init__(self, x, y, size):
         self.x = int(x)
@@ -12,8 +14,8 @@ class Cursor:
         self.menu_switch = {'Build' : True}
         self.menu_block = {
                             0 : 'Wall',
-                            1 : 'Tower',
-                            2 : 'Air tower',
+                            1 : 'Heavy tower',
+                            2 : 'Light tower',
                             3 : 'Torch',
                             4 : 'Farm'}
 

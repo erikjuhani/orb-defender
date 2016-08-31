@@ -1,4 +1,3 @@
-import random
 from pygame import *
 from entity import *
 from tile import Tile
@@ -6,13 +5,19 @@ from game_clock import Clock
 from sprite import *
 
 import math
+import random
 
+'''
 DEFAULT_CLOCK = 6, 0, 10, 6
 FAST_CLOCK = 6, 0, 60, 6
 REAL_CLOCK = 6, 0, 1, 6
+'''
 
 class Level:
     def __init__(self, map_size, tile_size):
+        ''' The largest component in the game.
+        Handles all the functions and keeps tract
+        of the values in current game. '''
         self.map_size = map_size
         self.tile_size = tile_size
         self.terrain_map = [0] * (self.map_size * self.map_size) # init empty map
@@ -21,14 +26,18 @@ class Level:
         self.monsters = []
         self.bullets = []
         self.generate_level()
-        self.game_clock = Clock(6, 0, 20, 6)
-        self.brightness_layer = 0.0
+        self.game_clock = Clock(6, 0, 20, 6) # Game clock
+        self.brightness_layer = 0.0 # Starts at 'black'
         self.game_start = True
         self.gold = 60
+
+        ''' Convert all the images for better framerate '''
         for key in textures:
             textures[key].convert()
 
     def restart_level(self):
+        ''' Reverts all the level variables to default.
+        Starts a new game. '''
         self.heart_pos = 0
         self.heart_hp = 20
         self.entities = []
@@ -41,23 +50,24 @@ class Level:
         self.gold = 60
 
     def create_tile(self, x, y, tile_name):
-
+        ''' Replaces a tile object in the map with another
+        if nothing matches, replace nothing. '''
         tile = None
 
-        if tile_name == 'Tower' and self.gold - 40 >= 0:
-            tile = Tile(x, y, 'Tower', (244, 219, 168), self.tile_size, Sprite(textures['tower1']), 8, False, False, 40)
+        if tile_name == 'Heavy tower' and self.gold - 40 >= 0:
+            tile = Tile(x, y, 'Heavy tower', (244, 219, 168), self.tile_size, Sprite(textures['tower1']), 8, False, False, 40)
             self.gold -= tile.tile_price
-        elif tile_name == 'Air tower' and self.gold - 10 >= 0:
-            tile = Tile(x, y, 'Air tower', (244, 219, 168), self.tile_size, Sprite(textures['tower2']), 4, False, False, 10)
+        elif tile_name == 'Light tower' and self.gold - 10 >= 0:
+            tile = Tile(x, y, 'Light tower', (244, 219, 168), self.tile_size, Sprite(textures['tower2']), 4, False, False, 10)
             self.gold -= tile.tile_price
         elif tile_name == 'Wall' and self.gold - 5 >= 0:
             tile = Tile(x, y, 'Wall', (244, 219, 168), self.tile_size, Sprite(textures['wall']), 20, False, False, 5)
             self.gold -= tile.tile_price
-        elif tile_name == 'Torch' and self.gold - 2 >= 0:
-            tile = Tile(x, y, 'Torch', (244, 219, 168), self.tile_size, Sprite(textures['torch']), 2, False, True, 2)
+        elif tile_name == 'Torch' and self.gold - 1 >= 0:
+            tile = Tile(x, y, 'Torch', (244, 219, 168), self.tile_size, Sprite(textures['torch']), 2, False, True, 1)
             self.gold -= tile.tile_price
-        elif tile_name == 'Farm' and self.gold - 50 >= 0:
-            tile = Tile(x, y, 'Farm', (244, 219, 168), self.tile_size, Sprite(textures['farm']), 10, False, False, 50)
+        elif tile_name == 'Farm' and self.gold - 100 >= 0:
+            tile = Tile(x, y, 'Farm', (244, 219, 168), self.tile_size, Sprite(textures['farm']), 10, False, False, 100)
             self.gold -= tile.tile_price
         else:
             tile = Tile(x, y, 'Sand', (244, 219, 168), self.tile_size)
@@ -66,22 +76,25 @@ class Level:
         self.terrain_map[pos] = tile
 
     def break_tile(self, x, y):
+        ''' Replaces a tile in map position with a new tile called Rubble '''
         pos = (int(x + y * self.map_size))
         self.terrain_map[pos] = Tile(x, y, 'Rubble', (146, 133, 108), self.tile_size)
 
-    def spawn_entities(self):
+    def spawn_orb(self):
+        ''' Places the Orb/Heart to the middle of the map '''
         x = self.map_size//2
         y = self.map_size//2
         self.heart_pos = (x, y)
         map_pos = x + y * self.map_size
-        self.terrain_map[map_pos] = Tile(x, y, 'Heart', (244, 219, 168), self.tile_size, Sprite(textures['orb']), self.heart_hp, False, True)
+        self.terrain_map[map_pos] = Tile(x, y, 'Orb', (244, 219, 168), self.tile_size, Sprite(textures['orb']), self.heart_hp, False, True)
 
     def spawn_monsters(self):
-
-        amount = self.game_clock.days
+        ''' Handles monster spawning.
+        '''
+        amount = int(round(self.game_clock.days * 1.1))
 
         if self.game_clock.days % 10 == 0:
-            amount += int(self.game_clock.days * 1.1)
+            amount = int(round(amount * 1.5))
 
         self.spawn_monster('basic', amount + 1)
 
@@ -95,9 +108,13 @@ class Level:
             self.spawn_monster('flyer', amount + 2)
 
     def spawn_monster(self, monster_type, amount):
+        ''' Determines the spawning area for monsters.
+        '''
         spawn_area = [-1, self.map_size + 1]
         monster = None
 
+        ''' Spawns according to type call,
+        what monster to spawn and how many times '''
         for m in range(amount):
             randx = random.randint(-1, self.map_size + 1)
             randy = 0
@@ -108,24 +125,28 @@ class Level:
                 randy = random.randint(-1, self.map_size + 1)
 
             if monster_type == 'crawler':
-                monster = Monster(randx, randy, random.randint(3, 4), 25, self.tile_size, (114, 127, 79), 4, False, False, Sprite(textures['monster2']))
+                monster = Monster(randx, randy, random.randint(4, 5), 25, self.tile_size, (114, 127, 79), 4, False, False, Sprite(textures['monster2']))
             elif monster_type == 'flyer':
                 monster = Monster(randx, randy, random.randint(8, 10), 3, self.tile_size, (114, 127, 79), 0.5, True, False, Sprite(textures['monster3']))
             elif monster_type == 'spawner':
-                monster = Monster(randx, randy, random.randint(2, 4), 50, self.tile_size, (114, 127, 79), 8, False, True, Sprite(textures['monster4']))
+                monster = Monster(randx, randy, random.randint(2, 4), 100, self.tile_size, (114, 127, 79), 8, False, True, Sprite(textures['monster4']))
             else:
                 monster = Monster(randx, randy, random.randint(5, 7), 10, self.tile_size, (114, 127, 79), 2, False, False, Sprite(textures['monster1']))
 
-            self.monsters.append(monster)
+            self.monsters.append(monster) # Add to monster list
 
     def generate_level(self):
+        ''' Fills the map with sand tiles '''
         for y in range(self.map_size):
             for x in range(self.map_size):
                 self.terrain_map[x + y * self.map_size] = Tile(x, y, 'Sand', (244, 219, 168), self.tile_size)
 
-        self.spawn_entities()
+        self.spawn_orb()
 
     def light_tile(self, ox, oy):
+        ''' Handles light sources.
+        Checks for tiles that are close enough to a light source.
+        Changes the light amount on these tiles. '''
         for y in range(oy-6, oy+7):
             for x in range(ox-6, ox+7):
                 if x >= 0 and x < self.map_size and y >= 0 and y < self.map_size:
@@ -148,7 +169,8 @@ class Level:
                     tile_l.add_light(light_amount)
 
     def update(self, dt):
-
+        ''' Handles all the updates in the level.
+        Handles the day and night system. '''
         for pos in range(self.map_size * self.map_size):
             tile = self.terrain_map[pos]
             if not tile.passable:
@@ -156,7 +178,7 @@ class Level:
                 if tile.hp <= 0:
                     self.break_tile(tile.x, tile.y)
 
-            if tile.tile_name == 'Heart' and self.heart_hp > tile.hp:
+            if tile.tile_name == 'Orb' and self.heart_hp > tile.hp:
                 self.heart_hp = tile.hp
 
             if not tile.sprite == None:
@@ -214,9 +236,10 @@ class Level:
                 terrain = self.terrain_map[pos]
                 if terrain.passable and not terrain.tile_name == 'Bones':
                     self.terrain_map[pos] = Tile(monster.x, monster.y, 'Bones', (244, 219, 168), self.tile_size, Sprite(textures['bones']))
-                self.monsters[i].remove = True
+                self.monsters[i].remove = True # Exclude the monster from the new list
             monster.simple_move(self, self.heart_pos[0], self.heart_pos[1], dt)
 
+        ''' Create a new list of not removed monsters '''
         self.monsters[:] = [monster for monster in self.monsters if not monster.remove]
 
         for i in range(len(self.bullets)):
@@ -229,9 +252,11 @@ class Level:
                 self.bullets[i].remove = True
                 continue
 
+        ''' Create a new list of not removed bullets '''
         self.bullets[:] = [x for x in self.bullets if not x.remove]
 
     def draw(self, screen, xoff, yoff):
+        ''' Draws all the components on the level. '''
         for pos in range(self.map_size * self.map_size):
             tile = self.terrain_map[pos]
             yp = tile.y + int(yoff)

@@ -2,6 +2,8 @@ from pygame import draw, font
 from key_dict import *
 from sprite import *
 
+''' Handles the main menu and game gui '''
+
 BLUE = (84, 188, 236)
 WHITE = (255, 255, 255)
 
@@ -11,6 +13,8 @@ TXT_SURF = {
         'Help'  : convert_string('Help'),
         'Quit'  : convert_string('Quit Game')
         }
+
+COIN = transform.scale(textures['coin'],(textures['coin'].get_width()*3, textures['coin'].get_height()*3))
 
 class Main_menu:
     def __init__(self, size):
@@ -66,7 +70,18 @@ class Main_menu:
 
 
     def draw_help(self, screen):
-        wall_of_text = 'Help!\nControls: WASD\nWhat to do: Survive:)'
+        wall_of_text = str("MAIN OBJECTIVES:\n"
+        + "Protect the orb.\n"
+        + "Build walls, towers and farms.\n"
+        + "Survive the hordes of enemies.\n\n"
+        + "CONTROLS:\n"
+        + "Arrow keys, or (W, A, S, D) for direction\n"
+        + "Return key or 'E' for placing blocks\n"
+        + "'R' for restart\n"
+        + "'F' for changing blocks\n"
+        + "Escape key or\n"
+        + "'Q' for exit screen/quitting the game")
+        #wall_of_text = 'Help!\nControls: WASD\nWhat to do: Survive:)'
         help_text = wall_of_text.split('\n')
         width = len(wall_of_text)
         height = len(help_text)
@@ -75,7 +90,7 @@ class Main_menu:
 
         for line in help_text:
             line_surf = convert_string(line)
-            screen.blit(transform.scale(line_surf, (line_surf.get_width()*3, line_surf.get_height()*3)), (self.size*4, self.size*(2+i)))
+            screen.blit(transform.scale(line_surf, (line_surf.get_width()*2, line_surf.get_height()*2)), (self.size, self.size*(1+i)))
             i += 1
 
     def draw(self, screen):
@@ -103,8 +118,8 @@ class Game_gui:
         self.paused = False
         self.blocks = {
                         'Wall' : transform.scale(textures['wall'],(textures['wall'].get_width()*3, textures['wall'].get_height()*3)),
-                        'Tower': transform.scale(textures['tower1'],(textures['tower1'].get_width()*3, textures['tower1'].get_height()*3)),
-                        'Air tower' : transform.scale(textures['tower2'],(textures['tower2'].get_width()*3, textures['tower2'].get_height()*3)),
+                        'Heavy tower': transform.scale(textures['tower1'],(textures['tower1'].get_width()*3, textures['tower1'].get_height()*3)),
+                        'Light tower' : transform.scale(textures['tower2'],(textures['tower2'].get_width()*3, textures['tower2'].get_height()*3)),
                         'Torch' : transform.scale(textures['torch'],(textures['torch'].get_width()*3, textures['torch'].get_height()*3)),
                         'Farm' : transform.scale(textures['farm'],(textures['farm'].get_width()*3, textures['farm'].get_height()*3)),
                     }
@@ -167,7 +182,7 @@ class Game_gui:
                     level.restart_level()
                     cursor.x = level.map_size//2
                     cursor.y = level.map_size//2
-                if KEY_DICT[key] == 'escape' and self.paused:
+                if KEY_DICT[key] == 'escape' and (self.paused or level.heart_hp <= 0):
                     level.restart_level()
                     cursor.x = level.map_size//2
                     cursor.y = level.map_size//2
@@ -193,10 +208,10 @@ class Game_gui:
     def draw(self, screen):
         draw.rect(screen, (0, 0, 0), (0, 0, self.width, self.size))
         screen.blit(self.current_block, (self.width-self.size*2, self.y, self.size, self.size))
-        draw.ellipse(screen, (255, 255, 0), (self.size//3, self.size//3-1, self.size//2-1, self.size//2-1))
+        screen.blit(COIN, (0, 0))
         screen.blit(self.draw_msg(self.gold), (self.size, self.size//4))
         screen.blit(self.draw_msg(self.current_i), (self.size*4, self.size//4))
-        screen.blit(self.draw_msg(int(self.level.heart_hp)), (self.size*8, self.size//4))
+        screen.blit(self.draw_msg('HP ' + str(int(self.level.heart_hp))), (self.width-self.size*6, self.size//4))
         if self.paused:
             screen.blit(self.draw_msg('GAME PAUSED'), (self.size*8, self.size//4))
 
