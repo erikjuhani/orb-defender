@@ -29,7 +29,7 @@ class Level:
         self.game_clock = Clock(6, 0, 20, 6) # Game clock
         self.brightness_layer = 0.0 # Starts at 'black'
         self.game_start = True
-        self.gold = 60
+        self.gold = 100
 
         ''' Convert all the images for better framerate '''
         for key in textures:
@@ -47,7 +47,7 @@ class Level:
         self.game_clock = Clock(6, 0, 20, 6)
         self.brightness_layer = 0.0
         self.game_start = True
-        self.gold = 60
+        self.gold = 100
 
     def create_tile(self, x, y, tile_name):
         ''' Replaces a tile object in the map with another
@@ -66,8 +66,8 @@ class Level:
         elif tile_name == 'Torch' and self.gold - 1 >= 0:
             tile = Tile(x, y, 'Torch', (244, 219, 168), self.tile_size, Sprite(textures['torch']), 2, False, True, 1)
             self.gold -= tile.tile_price
-        elif tile_name == 'Farm' and self.gold - 100 >= 0:
-            tile = Tile(x, y, 'Farm', (244, 219, 168), self.tile_size, Sprite(textures['farm']), 10, False, False, 100)
+        elif tile_name == 'Farm' and self.gold - 80 >= 0:
+            tile = Tile(x, y, 'Farm', (244, 219, 168), self.tile_size, Sprite(textures['farm']), 10, False, False, 80)
             self.gold -= tile.tile_price
         else:
             tile = Tile(x, y, 'Sand', (244, 219, 168), self.tile_size)

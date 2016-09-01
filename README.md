@@ -21,6 +21,8 @@ CONTROLS:
 
 <kbd>R</kbd> for restart
 
+<kbd>P</kbd> for pausing the game
+
 <kbd>F</kbd> for changing blocks
 
 <kbd>Escape</kbd> key or

@@ -1,4 +1,4 @@
-from pygame import draw, font
+from pygame import draw
 from key_dict import *
 from sprite import *
 
@@ -27,7 +27,6 @@ class Main_menu:
         self.quit_color = WHITE
 
         self.size = size
-        self.font = font.Font(None, size)
         self.menu = {
                 'Title' : transform.scale(TXT_SURF['Title'], (TXT_SURF['Title'].get_width()*6, TXT_SURF['Title'].get_height()*6)),
                 'New'   : transform.scale(TXT_SURF['New'], (TXT_SURF['New'].get_width()*3, TXT_SURF['New'].get_height()*3)),
@@ -107,7 +106,6 @@ class Game_gui:
     def __init__(self, screen, level, size):
         self.x = 0
         self.y = 0
-        self.font = font.Font(None, size)
         self.current_i = 'Nothing'
         self.size = size
         self.width = screen.get_width()
